@@ -34,7 +34,14 @@ jobs:
         run: uv pip install --system -e ".[dev]"
 
       - name: Run tests
-        run: pytest -v
+        run: pytest -v --cov=pywho --cov-report=xml
+
+      - name: Upload coverage
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage.xml
+          fail_ci_on_error: false
 
       - name: Type check
         run: mypy src/pywho
