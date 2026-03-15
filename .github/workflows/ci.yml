@@ -42,6 +42,10 @@ jobs:
           pip install codecov-cli
           codecovcli upload-process --token ${{ secrets.CODECOV_TOKEN }} --file coverage.xml --git-service github
 
+      - name: Lint
+        run: ruff check src/ tests/
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
+
       - name: Type check
         run: mypy src/pywho
         if: matrix.python-version != '3.9'

@@ -4,20 +4,20 @@ from __future__ import annotations
 
 import json
 import sys
-from pathlib import Path
+from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, patch
-
-import pytest
 
 from pywho.tracer import (
     ModuleType,
     PathSearchEntry,
     SearchResult,
-    TraceReport,
     _classify_module,
     _detect_shadows,
     trace_import,
 )
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class TestTraceStdlib:
@@ -164,17 +164,31 @@ class TestDetectShadows:
     """Test shadow detection logic."""
 
     def test_no_shadow_with_single_found(self) -> None:
+        stdlib_json = "/usr/lib/python3.12/json/__init__.py"
         log = [
-            PathSearchEntry(path="/usr/lib/python3.12", result=SearchResult.FOUND, candidate="/usr/lib/python3.12/json/__init__.py"),
+            PathSearchEntry(
+                path="/usr/lib/python3.12",
+                result=SearchResult.FOUND,
+                candidate=stdlib_json,
+            ),
             PathSearchEntry(path="/tmp", result=SearchResult.NOT_FOUND),
         ]
         shadows = _detect_shadows("json", log, ModuleType.STDLIB)
         assert len(shadows) == 0
 
     def test_local_shadows_third_party(self) -> None:
+        site_pkg = "/usr/lib/python3.12/site-packages"
         log = [
-            PathSearchEntry(path="/project", result=SearchResult.FOUND, candidate="/project/requests.py"),
-            PathSearchEntry(path="/usr/lib/python3.12/site-packages", result=SearchResult.FOUND, candidate="/usr/lib/python3.12/site-packages/requests/__init__.py"),
+            PathSearchEntry(
+                path="/project",
+                result=SearchResult.FOUND,
+                candidate="/project/requests.py",
+            ),
+            PathSearchEntry(
+                path=site_pkg,
+                result=SearchResult.FOUND,
+                candidate=f"{site_pkg}/requests/__init__.py",
+            ),
         ]
         shadows = _detect_shadows("requests", log, ModuleType.LOCAL)
         assert len(shadows) >= 1

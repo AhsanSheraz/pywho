@@ -8,7 +8,6 @@ import sys
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional, Set
 
 
 class ModuleType(Enum):
@@ -36,7 +35,7 @@ class PathSearchEntry:
 
     path: str
     result: SearchResult
-    candidate: Optional[str] = None  # file that was found (if any)
+    candidate: str | None = None  # file that was found (if any)
 
 
 @dataclass(frozen=True)
@@ -53,15 +52,15 @@ class TraceReport:
     """Complete import resolution trace for a single module."""
 
     module_name: str
-    resolved_path: Optional[str]
+    resolved_path: str | None
     module_type: ModuleType
     is_package: bool
     is_cached: bool
-    submodule_of: Optional[str]
-    search_log: List[PathSearchEntry] = field(default_factory=list)
-    shadows: List[ShadowWarning] = field(default_factory=list)
+    submodule_of: str | None
+    search_log: list[PathSearchEntry] = field(default_factory=list)
+    shadows: list[ShadowWarning] = field(default_factory=list)
 
-    def to_dict(self) -> Dict[str, object]:
+    def to_dict(self) -> dict[str, object]:
         """Serialize to a JSON-compatible dictionary."""
         return {
             "module_name": self.module_name,
@@ -89,7 +88,7 @@ class TraceReport:
         }
 
 
-def _get_stdlib_names() -> Set[str]:
+def _get_stdlib_names() -> set[str]:
     """Return stdlib module names."""
     if hasattr(sys, "stdlib_module_names"):
         return set(sys.stdlib_module_names)
@@ -119,7 +118,7 @@ def _get_stdlib_names() -> Set[str]:
 
 def _classify_module(
     name: str,
-    spec: Optional[importlib.machinery.ModuleSpec],
+    spec: importlib.machinery.ModuleSpec | None,
 ) -> ModuleType:
     """Classify a module based on its spec."""
     if spec is None:
@@ -150,11 +149,11 @@ def _classify_module(
 
 def _find_candidates_on_path(
     name: str,
-    search_paths: List[str],
-) -> List[PathSearchEntry]:
+    search_paths: list[str],
+) -> list[PathSearchEntry]:
     """Walk sys.path and check each entry for the module."""
     top_level = name.split(".")[0]
-    entries: List[PathSearchEntry] = []
+    entries: list[PathSearchEntry] = []
 
     for path_str in search_paths:
         if not path_str:
@@ -209,12 +208,12 @@ def _find_candidates_on_path(
 
 def _detect_shadows(
     name: str,
-    search_log: List[PathSearchEntry],
+    search_log: list[PathSearchEntry],
     module_type: ModuleType,
-) -> List[ShadowWarning]:
+) -> list[ShadowWarning]:
     """Detect if any earlier path entries shadow the resolved module."""
     stdlib_names = _get_stdlib_names()
-    shadows: List[ShadowWarning] = []
+    shadows: list[ShadowWarning] = []
 
     found_entries = [e for e in search_log if e.result == SearchResult.FOUND]
     if len(found_entries) <= 1:
@@ -242,9 +241,12 @@ def _detect_shadows(
 
     # If multiple found, the first one shadows the rest
     for other in found_entries[1:]:
-        if other.candidate and winner.candidate and other.candidate != winner.candidate:
-            # Check if the shadowed one is in site-packages (third-party)
-            if "site-packages" in (other.candidate or ""):
+        if (
+            other.candidate
+            and winner.candidate
+            and other.candidate != winner.candidate
+            and "site-packages" in (other.candidate or "")
+        ):
                 shadows.append(ShadowWarning(
                     shadow_path=winner.candidate or "unknown",
                     shadowed_module=top_level,
@@ -280,9 +282,9 @@ def trace_import(
     except (ModuleNotFoundError, ValueError):
         spec = None
 
-    resolved_path: Optional[str] = None
+    resolved_path: str | None = None
     is_package = False
-    submodule_of: Optional[str] = None
+    submodule_of: str | None = None
 
     if spec is not None:
         resolved_path = spec.origin
@@ -300,7 +302,7 @@ def trace_import(
 
     # In non-verbose mode, only keep FOUND entries and the first few NOT_FOUND
     if not verbose:
-        filtered: List[PathSearchEntry] = []
+        filtered: list[PathSearchEntry] = []
         not_found_count = 0
         for entry in search_log:
             if entry.result == SearchResult.FOUND:

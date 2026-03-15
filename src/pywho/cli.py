@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from typing import Optional, Sequence
+from typing import TYPE_CHECKING
 
 from pywho import __version__
 from pywho.formatter import format_report
@@ -14,6 +14,9 @@ from pywho.scan_formatter import format_scan
 from pywho.scanner import scan_path
 from pywho.trace_formatter import format_trace
 from pywho.tracer import trace_import
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -147,7 +150,7 @@ def _run_inspect(args: argparse.Namespace) -> int:
     return 0
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     """Entry point for the CLI."""
     parser = _build_parser()
     args = parser.parse_args(argv)

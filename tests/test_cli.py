@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import json
 import sys
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
 from pywho.cli import main
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class TestCLI:
@@ -72,7 +75,9 @@ class TestCLITrace:
         assert "Import Resolution" in captured.out
         assert result == 0
 
-    def test_trace_with_shadow_returns_nonzero(self, tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    def test_trace_with_shadow_returns_nonzero(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
         (tmp_path / "json.py").write_text("# shadow")
         original_path = sys.path.copy()
         sys.path.insert(0, str(tmp_path))

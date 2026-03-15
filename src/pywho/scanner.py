@@ -8,7 +8,6 @@ import sys
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional, Set
 
 
 class Severity(Enum):
@@ -34,7 +33,7 @@ class ShadowResult:
         return f"shadows installed package '{self.module_name}'"
 
 
-def _get_stdlib_names() -> Set[str]:
+def _get_stdlib_names() -> set[str]:
     """Return stdlib module names."""
     if hasattr(sys, "stdlib_module_names"):
         return set(sys.stdlib_module_names)
@@ -63,12 +62,12 @@ def _get_stdlib_names() -> Set[str]:
 
 
 # Files that are common project files, not intended as importable modules
-_IGNORE_NAMES: Set[str] = {
+_IGNORE_NAMES: set[str] = {
     "setup", "conftest", "manage", "__init__", "__main__",
 }
 
 # Directories to skip during scanning
-_EXCLUDE_DIRS: Set[str] = {
+_EXCLUDE_DIRS: set[str] = {
     ".git", ".hg", ".svn", "__pycache__", ".tox", ".nox",
     ".mypy_cache", ".pytest_cache", "node_modules", ".venv",
     "venv", "env", ".env", "site-packages", ".eggs", "dist",
@@ -88,16 +87,14 @@ def _is_installed_package(name: str) -> bool:
         if origin.startswith(stdlib_path) and "site-packages" not in origin:
             return False
         # Exclude builtins and frozen
-        if origin in ("built-in", "frozen"):
-            return False
-        return True
+        return origin not in ("built-in", "frozen")
     except (ModuleNotFoundError, ValueError):
         return False
 
 
-def _walk_python_files(root: Path, exclude_dirs: Set[str]) -> List[Path]:
+def _walk_python_files(root: Path, exclude_dirs: set[str]) -> list[Path]:
     """Walk directory tree yielding .py files, respecting exclusions."""
-    files: List[Path] = []
+    files: list[Path] = []
     for dirpath, dirnames, filenames in os.walk(root):
         dirnames[:] = [
             d for d in dirnames
@@ -113,9 +110,9 @@ def scan_path(
     root: Path,
     *,
     check_installed: bool = True,
-    exclude_dirs: Optional[Set[str]] = None,
-    ignore_names: Optional[Set[str]] = None,
-) -> List[ShadowResult]:
+    exclude_dirs: set[str] | None = None,
+    ignore_names: set[str] | None = None,
+) -> list[ShadowResult]:
     """
     Scan a directory tree for Python files that shadow stdlib or installed packages.
 
@@ -134,7 +131,7 @@ def scan_path(
         ignore_names = _IGNORE_NAMES
 
     stdlib = _get_stdlib_names()
-    results: List[ShadowResult] = []
+    results: list[ShadowResult] = []
 
     if root.is_file():
         candidates = [root] if root.suffix == ".py" else []
