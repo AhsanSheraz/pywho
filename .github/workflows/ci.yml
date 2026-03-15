@@ -38,10 +38,11 @@ jobs:
 
       - name: Upload coverage
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v5.5.2
         with:
           files: coverage.xml
           token: ${{ secrets.CODECOV_TOKEN }}
+          use_oidc: false
           fail_ci_if_error: false
 
       - name: Type check
