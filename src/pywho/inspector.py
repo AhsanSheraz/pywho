@@ -144,7 +144,8 @@ def _detect_venv() -> VenvInfo:
         orig_prefix_file = Path(venv_path) / "Lib" / "orig-prefix.txt"
     else:
         orig_prefix_file = (
-            Path(venv_path) / "lib"
+            Path(venv_path)
+            / "lib"
             / f"python{sys.version_info.major}.{sys.version_info.minor}"
             / "orig-prefix.txt"
         )

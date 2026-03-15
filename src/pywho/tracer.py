@@ -94,25 +94,118 @@ def _get_stdlib_names() -> set[str]:
         return set(sys.stdlib_module_names)
     # Fallback for 3.9
     return {
-        "abc", "argparse", "ast", "asyncio", "base64", "bisect", "builtins",
-        "calendar", "cmath", "cmd", "code", "codecs", "collections",
-        "configparser", "contextlib", "copy", "csv", "ctypes", "dataclasses",
-        "datetime", "decimal", "difflib", "dis", "email", "enum", "errno",
-        "fnmatch", "fractions", "ftplib", "functools", "gc", "getpass",
-        "glob", "gzip", "hashlib", "heapq", "hmac", "html", "http",
-        "importlib", "inspect", "io", "itertools", "json", "keyword",
-        "linecache", "locale", "logging", "lzma", "math", "mimetypes",
-        "multiprocessing", "numbers", "operator", "os", "pathlib", "pdb",
-        "pickle", "platform", "pprint", "profile", "pstats", "queue",
-        "random", "re", "readline", "reprlib", "resource", "sched",
-        "secrets", "select", "shelve", "shlex", "shutil", "signal",
-        "site", "smtplib", "socket", "socketserver", "sqlite3", "ssl",
-        "stat", "statistics", "string", "struct", "subprocess", "sys",
-        "sysconfig", "tarfile", "tempfile", "textwrap", "threading",
-        "time", "timeit", "token", "tokenize", "traceback", "types",
-        "typing", "unicodedata", "unittest", "urllib", "uuid", "venv",
-        "warnings", "weakref", "webbrowser", "xml", "xmlrpc", "zipfile",
-        "zipimport", "zlib",
+        "abc",
+        "argparse",
+        "ast",
+        "asyncio",
+        "base64",
+        "bisect",
+        "builtins",
+        "calendar",
+        "cmath",
+        "cmd",
+        "code",
+        "codecs",
+        "collections",
+        "configparser",
+        "contextlib",
+        "copy",
+        "csv",
+        "ctypes",
+        "dataclasses",
+        "datetime",
+        "decimal",
+        "difflib",
+        "dis",
+        "email",
+        "enum",
+        "errno",
+        "fnmatch",
+        "fractions",
+        "ftplib",
+        "functools",
+        "gc",
+        "getpass",
+        "glob",
+        "gzip",
+        "hashlib",
+        "heapq",
+        "hmac",
+        "html",
+        "http",
+        "importlib",
+        "inspect",
+        "io",
+        "itertools",
+        "json",
+        "keyword",
+        "linecache",
+        "locale",
+        "logging",
+        "lzma",
+        "math",
+        "mimetypes",
+        "multiprocessing",
+        "numbers",
+        "operator",
+        "os",
+        "pathlib",
+        "pdb",
+        "pickle",
+        "platform",
+        "pprint",
+        "profile",
+        "pstats",
+        "queue",
+        "random",
+        "re",
+        "readline",
+        "reprlib",
+        "resource",
+        "sched",
+        "secrets",
+        "select",
+        "shelve",
+        "shlex",
+        "shutil",
+        "signal",
+        "site",
+        "smtplib",
+        "socket",
+        "socketserver",
+        "sqlite3",
+        "ssl",
+        "stat",
+        "statistics",
+        "string",
+        "struct",
+        "subprocess",
+        "sys",
+        "sysconfig",
+        "tarfile",
+        "tempfile",
+        "textwrap",
+        "threading",
+        "time",
+        "timeit",
+        "token",
+        "tokenize",
+        "traceback",
+        "types",
+        "typing",
+        "unicodedata",
+        "unittest",
+        "urllib",
+        "uuid",
+        "venv",
+        "warnings",
+        "weakref",
+        "webbrowser",
+        "xml",
+        "xmlrpc",
+        "zipfile",
+        "zipimport",
+        "zlib",
     }
 
 
@@ -161,47 +254,57 @@ def _find_candidates_on_path(
 
         path = Path(path_str)
         if not path.is_dir():
-            entries.append(PathSearchEntry(
-                path=path_str,
-                result=SearchResult.SKIPPED,
-            ))
+            entries.append(
+                PathSearchEntry(
+                    path=path_str,
+                    result=SearchResult.SKIPPED,
+                )
+            )
             continue
 
         # Check for package (directory with __init__.py)
         pkg_init = path / top_level / "__init__.py"
         if pkg_init.exists():
-            entries.append(PathSearchEntry(
-                path=path_str,
-                result=SearchResult.FOUND,
-                candidate=str(pkg_init),
-            ))
+            entries.append(
+                PathSearchEntry(
+                    path=path_str,
+                    result=SearchResult.FOUND,
+                    candidate=str(pkg_init),
+                )
+            )
             continue
 
         # Check for single-file module
         module_file = path / f"{top_level}.py"
         if module_file.exists():
-            entries.append(PathSearchEntry(
-                path=path_str,
-                result=SearchResult.FOUND,
-                candidate=str(module_file),
-            ))
+            entries.append(
+                PathSearchEntry(
+                    path=path_str,
+                    result=SearchResult.FOUND,
+                    candidate=str(module_file),
+                )
+            )
             continue
 
         # Check for compiled extensions
         for ext in importlib.machinery.EXTENSION_SUFFIXES:
             ext_file = path / f"{top_level}{ext}"
             if ext_file.exists():
-                entries.append(PathSearchEntry(
-                    path=path_str,
-                    result=SearchResult.FOUND,
-                    candidate=str(ext_file),
-                ))
+                entries.append(
+                    PathSearchEntry(
+                        path=path_str,
+                        result=SearchResult.FOUND,
+                        candidate=str(ext_file),
+                    )
+                )
                 break
         else:
-            entries.append(PathSearchEntry(
-                path=path_str,
-                result=SearchResult.NOT_FOUND,
-            ))
+            entries.append(
+                PathSearchEntry(
+                    path=path_str,
+                    result=SearchResult.NOT_FOUND,
+                )
+            )
 
     return entries
 
@@ -233,11 +336,13 @@ def _detect_shadows(
             winner_in_stdlib = True
 
         if not winner_in_stdlib:
-            shadows.append(ShadowWarning(
-                shadow_path=winner.candidate or "unknown",
-                shadowed_module=top_level,
-                description=f"'{winner.candidate}' shadows stdlib module '{top_level}'",
-            ))
+            shadows.append(
+                ShadowWarning(
+                    shadow_path=winner.candidate or "unknown",
+                    shadowed_module=top_level,
+                    description=f"'{winner.candidate}' shadows stdlib module '{top_level}'",
+                )
+            )
 
     # If multiple found, the first one shadows the rest
     for other in found_entries[1:]:
@@ -247,13 +352,15 @@ def _detect_shadows(
             and other.candidate != winner.candidate
             and "site-packages" in (other.candidate or "")
         ):
-                shadows.append(ShadowWarning(
+            shadows.append(
+                ShadowWarning(
                     shadow_path=winner.candidate or "unknown",
                     shadowed_module=top_level,
                     description=(
                         f"'{winner.candidate}' shadows installed package at '{other.candidate}'"
                     ),
-                ))
+                )
+            )
 
     return shadows
 

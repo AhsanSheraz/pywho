@@ -251,6 +251,7 @@ class TestFindCandidates:
 
     def test_finds_extension_module(self, tmp_path: Path) -> None:
         import importlib.machinery
+
         if importlib.machinery.EXTENSION_SUFFIXES:
             ext = importlib.machinery.EXTENSION_SUFFIXES[0]
             (tmp_path / f"fakemod{ext}").write_text("")

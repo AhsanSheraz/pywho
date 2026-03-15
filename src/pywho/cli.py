@@ -78,7 +78,8 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Output as JSON (for scripting, CI, or sharing).",
     )
     parser.add_argument(
-        "--packages", "-p",
+        "--packages",
+        "-p",
         action="store_true",
         help="Include list of all installed packages.",
     )
@@ -88,7 +89,8 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Skip pip version detection (faster).",
     )
     parser.add_argument(
-        "--version", "-v",
+        "--version",
+        "-v",
         action="version",
         version=f"pywho {__version__}",
     )

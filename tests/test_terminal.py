@@ -16,21 +16,27 @@ class TestSupportsColor:
             assert supports_color() is True
 
     def test_ansicon_returns_true(self) -> None:
-        with patch.dict(os.environ, {"ANSICON": "1"}), \
-             patch("sys.stdout", new=MagicMock(isatty=lambda: False)):
+        with (
+            patch.dict(os.environ, {"ANSICON": "1"}),
+            patch("sys.stdout", new=MagicMock(isatty=lambda: False)),
+        ):
             assert supports_color() is True
 
     def test_wt_session_returns_true(self) -> None:
         env = {k: v for k, v in os.environ.items() if k != "ANSICON"}
         env["WT_SESSION"] = "1"
-        with patch.dict(os.environ, env, clear=True), \
-             patch("sys.stdout", new=MagicMock(isatty=lambda: False)):
+        with (
+            patch.dict(os.environ, env, clear=True),
+            patch("sys.stdout", new=MagicMock(isatty=lambda: False)),
+        ):
             assert supports_color() is True
 
     def test_no_terminal_returns_false(self) -> None:
         env = {k: v for k, v in os.environ.items() if k not in ("ANSICON", "WT_SESSION")}
-        with patch.dict(os.environ, env, clear=True), \
-             patch("sys.stdout", new=MagicMock(isatty=lambda: False)):
+        with (
+            patch.dict(os.environ, env, clear=True),
+            patch("sys.stdout", new=MagicMock(isatty=lambda: False)),
+        ):
             assert supports_color() is False
 
 
