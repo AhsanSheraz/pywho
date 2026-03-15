@@ -50,3 +50,5 @@ pywho
 - Site-packages locations
 - JSON output for CI/scripting
 - Installed package listing
+- Import tracing (`pywho trace <module>`)
+- Project-wide shadow scanning (`pywho scan .`)
