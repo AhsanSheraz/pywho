@@ -54,7 +54,7 @@ jobs:
         run: uv pip install --system -e ".[dev]"
 
       - name: Run tests with coverage
-        run: pytest -v --cov=pywho --cov-branch --cov-report=xml --cov-fail-under=95
+        run: pytest -v --cov=pywho --cov-branch --cov-report=xml --junitxml=junit.xml --cov-fail-under=95
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
