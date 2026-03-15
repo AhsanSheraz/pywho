@@ -64,6 +64,32 @@ class TestFormatterVenvBranches:
         assert "No" in output
         assert "Base Prefix" not in output
 
+    def test_format_active_venv_with_path_no_prompt(self) -> None:
+        report = EnvironmentReport(
+            executable="/usr/bin/python3",
+            version="3.12.0",
+            version_info="3.12.0",
+            implementation="CPython",
+            compiler="GCC",
+            architecture="64-bit",
+            build_date="",
+            platform_system="Linux",
+            platform_release="6.0",
+            platform_machine="x86_64",
+            venv=VenvInfo(is_active=True, type="venv", path="/home/user/.venv", prompt=None),
+            prefix="/home/user/.venv",
+            base_prefix="/usr",
+            exec_prefix="/usr",
+            sys_path=[],
+            site_packages=[],
+            package_manager="pip",
+            pip_version="24.0",
+            packages=[],
+        )
+        output = format_report(report)
+        assert "Path" in output
+        assert "Prompt" not in output
+
     def test_format_active_venv_without_path_and_prompt(self) -> None:
         report = EnvironmentReport(
             executable="/usr/bin/python3",

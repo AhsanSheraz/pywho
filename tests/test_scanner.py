@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 from pywho.scanner import (
     Severity,
@@ -179,6 +180,53 @@ class TestIsInstalledPackage:
 
     def test_builtin_module_not_detected(self) -> None:
         assert _is_installed_package("sys") is False
+
+    def test_value_error_returns_false(self) -> None:
+        with patch("pywho.scanner.importlib.util.find_spec", side_effect=ValueError("bad")):
+            assert _is_installed_package("badmod") is False
+
+    def test_frozen_module_not_detected(self) -> None:
+        mock_spec = MagicMock()
+        mock_spec.origin = "frozen"
+        with patch("pywho.scanner.importlib.util.find_spec", return_value=mock_spec):
+            assert _is_installed_package("_frozen") is False
+
+
+class TestScanPathOptions:
+    """Test scan_path with custom options."""
+
+    def test_custom_exclude_dirs(self, tmp_path: Path) -> None:
+        mydir = tmp_path / "custom"
+        mydir.mkdir()
+        (mydir / "math.py").write_text("")
+        results = scan_path(
+            tmp_path,
+            check_installed=False,
+            exclude_dirs={"custom"},
+        )
+        assert len(results) == 0
+
+    def test_custom_ignore_names(self, tmp_path: Path) -> None:
+        (tmp_path / "math.py").write_text("")
+        results = scan_path(
+            tmp_path,
+            check_installed=False,
+            ignore_names={"math"},
+        )
+        assert len(results) == 0
+
+    def test_egg_info_dirs_excluded(self, tmp_path: Path) -> None:
+        egg_dir = tmp_path / "mypackage.egg-info"
+        egg_dir.mkdir()
+        (egg_dir / "math.py").write_text("")
+        results = scan_path(tmp_path, check_installed=False)
+        assert len(results) == 0
+
+    def test_underscore_prefix_skipped(self, tmp_path: Path) -> None:
+        (tmp_path / "_thread.py").write_text("")
+        results = scan_path(tmp_path, check_installed=False)
+        # _thread is in stdlib so it should be detected (it's an exception)
+        assert any(r.module_name == "_thread" for r in results)
 
 
 class TestInstalledPackageShadow:

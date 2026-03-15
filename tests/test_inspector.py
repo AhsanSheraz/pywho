@@ -158,6 +158,36 @@ class TestVenvDetection:
             assert venv.type == "uv"
             assert venv.prompt == "myproject"
 
+    def test_uv_venv_with_empty_prompt(self, tmp_path: Path) -> None:
+        fake_prefix = str(tmp_path / "uvvenv2")
+        (tmp_path / "uvvenv2").mkdir()
+        cfg_text = "home = /usr/bin\nuv = 0.1.0\nprompt = \n"
+        (tmp_path / "uvvenv2" / "pyvenv.cfg").write_text(cfg_text)
+
+        env_clean = {k: v for k, v in os.environ.items()
+                     if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
+        with patch.dict(os.environ, env_clean, clear=True), \
+             patch.object(sys, "prefix", fake_prefix), \
+             patch.object(sys, "base_prefix", "/usr"):
+            venv = _detect_venv()
+            assert venv.type == "uv"
+            assert venv.prompt == "uvvenv2"
+
+    def test_win32_orig_prefix_path(self, tmp_path: Path) -> None:
+        fake_prefix = str(tmp_path / "winvenv2")
+        win_lib = tmp_path / "winvenv2" / "Lib"
+        win_lib.mkdir(parents=True)
+        (win_lib / "orig-prefix.txt").write_text("C:\\Python312")
+
+        env_clean = {k: v for k, v in os.environ.items()
+                     if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
+        with patch.dict(os.environ, env_clean, clear=True), \
+             patch.object(sys, "prefix", fake_prefix), \
+             patch.object(sys, "base_prefix", "C:\\Python312"), \
+             patch.object(sys, "platform", "win32"):
+            venv = _detect_venv()
+            assert venv.type == "virtualenv"
+
     def test_poetry_venv_detection(self, tmp_path: Path) -> None:
         fake_prefix = str(tmp_path / "poetryvenv")
         (tmp_path / "poetryvenv").mkdir()
@@ -266,6 +296,16 @@ class TestPackageManager:
              patch.object(sys, "prefix", str(tmp_path)):
             assert _detect_package_manager() == "uv"
 
+    def test_cfg_exists_but_no_uv(self, tmp_path: Path) -> None:
+        cfg = tmp_path / "pyvenv.cfg"
+        cfg.write_text("home = /usr/bin\n")
+        env = {k: v for k, v in os.environ.items()
+               if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
+        with patch.dict(os.environ, env, clear=True), \
+             patch.object(sys, "prefix", str(tmp_path)), \
+             patch.object(sys, "executable", "/usr/bin/python"):
+            assert _detect_package_manager() == "pip"
+
     def test_uv_manager_cfg_read_error(self, tmp_path: Path) -> None:
         cfg = tmp_path / "pyvenv.cfg"
         cfg.write_text("uv = 0.5\n")
@@ -298,6 +338,17 @@ class TestPipVersion:
         mock_result = MagicMock()
         mock_result.returncode = 1
         with patch("pywho.inspector.subprocess.run", return_value=mock_result):
+            assert _get_pip_version() is None
+
+    def test_short_output_returns_none(self) -> None:
+        mock_result = MagicMock()
+        mock_result.returncode = 0
+        mock_result.stdout = "pip"
+        with patch("pywho.inspector.subprocess.run", return_value=mock_result):
+            assert _get_pip_version() is None
+
+    def test_oserror_returns_none(self) -> None:
+        with patch("pywho.inspector.subprocess.run", side_effect=OSError("fail")):
             assert _get_pip_version() is None
 
 

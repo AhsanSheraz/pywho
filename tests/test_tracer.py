@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, patch
@@ -11,8 +12,10 @@ from pywho.tracer import (
     ModuleType,
     PathSearchEntry,
     SearchResult,
+    ShadowWarning,
     _classify_module,
     _detect_shadows,
+    _find_candidates_on_path,
     trace_import,
 )
 
@@ -193,7 +196,87 @@ class TestDetectShadows:
         shadows = _detect_shadows("requests", log, ModuleType.LOCAL)
         assert len(shadows) >= 1
 
+    def test_stdlib_winner_not_flagged(self) -> None:
+        stdlib_path = os.path.dirname(os.__file__)
+        log = [
+            PathSearchEntry(
+                path=stdlib_path,
+                result=SearchResult.FOUND,
+                candidate=f"{stdlib_path}/json/__init__.py",
+            ),
+            PathSearchEntry(
+                path="/other",
+                result=SearchResult.FOUND,
+                candidate="/other/json.py",
+            ),
+        ]
+        shadows = _detect_shadows("json", log, ModuleType.STDLIB)
+        stdlib_shadows = [s for s in shadows if "shadows stdlib" in s.description]
+        assert len(stdlib_shadows) == 0
+
+    def test_shadow_with_none_candidates(self) -> None:
+        log = [
+            PathSearchEntry(
+                path="/a",
+                result=SearchResult.FOUND,
+                candidate=None,
+            ),
+            PathSearchEntry(
+                path="/b",
+                result=SearchResult.FOUND,
+                candidate=None,
+            ),
+        ]
+        shadows = _detect_shadows("requests", log, ModuleType.LOCAL)
+        assert isinstance(shadows, list)
+
     def test_find_spec_value_error(self) -> None:
         with patch("pywho.tracer.importlib.util.find_spec", side_effect=ValueError("bad")):
             report = trace_import("some.bad.module")
             assert report.module_type == ModuleType.NOT_FOUND
+
+
+class TestFindCandidates:
+    """Test path search candidate finding."""
+
+    def test_nondir_path_is_skipped(self, tmp_path: Path) -> None:
+        fake_path = str(tmp_path / "nonexistent")
+        entries = _find_candidates_on_path("os", [fake_path])
+        assert len(entries) == 1
+        assert entries[0].result == SearchResult.SKIPPED
+
+    def test_empty_string_uses_cwd(self, tmp_path: Path) -> None:
+        entries = _find_candidates_on_path("nonexistent_xyz_999", [""])
+        assert len(entries) == 1
+        assert entries[0].result == SearchResult.NOT_FOUND
+
+    def test_finds_extension_module(self, tmp_path: Path) -> None:
+        import importlib.machinery
+        if importlib.machinery.EXTENSION_SUFFIXES:
+            ext = importlib.machinery.EXTENSION_SUFFIXES[0]
+            (tmp_path / f"fakemod{ext}").write_text("")
+            entries = _find_candidates_on_path("fakemod", [str(tmp_path)])
+            assert any(e.result == SearchResult.FOUND for e in entries)
+
+
+class TestClassifyModuleBranches:
+    """Test additional classify branches."""
+
+    def test_classify_none_spec(self) -> None:
+        assert _classify_module("anything", None) == ModuleType.NOT_FOUND
+
+    def test_classify_dist_packages(self) -> None:
+        spec = MagicMock()
+        spec.origin = "/usr/lib/python3/dist-packages/something/__init__.py"
+        assert _classify_module("something", spec) == ModuleType.THIRD_PARTY
+
+    def test_classify_local_module(self) -> None:
+        spec = MagicMock()
+        spec.origin = "/home/user/project/mymod.py"
+        assert _classify_module("mymod", spec) == ModuleType.LOCAL
+
+    def test_classify_stdlib_by_path(self) -> None:
+        stdlib_path = os.path.dirname(os.__file__)
+        spec = MagicMock()
+        spec.origin = f"{stdlib_path}/somethingweird.py"
+        assert _classify_module("somethingweird", spec) == ModuleType.STDLIB
