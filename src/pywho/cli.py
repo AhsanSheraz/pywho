@@ -10,6 +10,8 @@ from typing import Optional, Sequence
 from pywho import __version__
 from pywho.formatter import format_report
 from pywho.inspector import inspect_environment
+from pywho.scan_formatter import format_scan
+from pywho.scanner import scan_path
 from pywho.trace_formatter import format_trace
 from pywho.tracer import trace_import
 
@@ -36,6 +38,29 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Show all sys.path entries, including skipped ones.",
     )
     trace_parser.add_argument(
+        "--json",
+        action="store_true",
+        dest="json_output",
+        help="Output as JSON.",
+    )
+
+    # --- scan subcommand ---
+    scan_parser = subparsers.add_parser(
+        "scan",
+        help="Scan a project for files that shadow stdlib or installed packages.",
+    )
+    scan_parser.add_argument(
+        "path",
+        nargs="?",
+        default=".",
+        help="Directory or file to scan (default: current directory).",
+    )
+    scan_parser.add_argument(
+        "--no-installed",
+        action="store_true",
+        help="Only check against stdlib, skip installed package checks.",
+    )
+    scan_parser.add_argument(
         "--json",
         action="store_true",
         dest="json_output",
@@ -80,6 +105,36 @@ def _run_trace(args: argparse.Namespace) -> int:
     return 1 if report.shadows else 0
 
 
+def _run_scan(args: argparse.Namespace) -> int:
+    """Handle the 'scan' subcommand."""
+    from pathlib import Path
+
+    target = Path(args.path).resolve()
+    if not target.exists():
+        print(f"Error: path '{args.path}' does not exist.", file=sys.stderr)
+        return 2
+
+    results = scan_path(target, check_installed=not args.no_installed)
+
+    if args.json_output:
+        data = [
+            {
+                "path": str(r.path),
+                "module": r.module_name,
+                "shadows": r.shadows,
+                "severity": r.severity.value,
+                "description": r.description,
+            }
+            for r in results
+        ]
+        print(json.dumps(data, indent=2))
+    else:
+        root = target if target.is_dir() else target.parent
+        print(format_scan(results, root))
+
+    return 1 if results else 0
+
+
 def _run_inspect(args: argparse.Namespace) -> int:
     """Handle the default environment inspection."""
     report = inspect_environment(include_packages=args.packages)
@@ -99,6 +154,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     if args.command == "trace":
         return _run_trace(args)
+    elif args.command == "scan":
+        return _run_scan(args)
 
     return _run_inspect(args)
 

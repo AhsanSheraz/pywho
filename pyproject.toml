@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pywho"
-version = "0.2.0"
-description = "One command to explain your Python environment and trace import resolution."
+version = "0.3.0"
+description = "One command to explain your Python environment, trace imports, and detect shadows."
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.9"

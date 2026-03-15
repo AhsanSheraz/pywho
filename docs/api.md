@@ -162,3 +162,50 @@ Frozen dataclass for a detected import shadow.
 | `shadow_path` | `str` | Path of the file causing the shadow |
 | `shadowed_module` | `str` | Name of the module being shadowed |
 | `description` | `str` | Human-readable description of the shadow |
+
+---
+
+## `scan_path`
+
+```python
+from pywho import scan_path
+from pathlib import Path
+
+results = scan_path(Path("."), check_installed=True)
+```
+
+**Parameters:**
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `root` | `Path` | *(required)* | Directory or file to scan |
+| `check_installed` | `bool` | `True` | Also check against installed packages (not just stdlib) |
+| `exclude_dirs` | `set[str] \| None` | `None` | Additional directory names to skip (merged with defaults) |
+| `ignore_names` | `set[str] \| None` | `None` | Additional filenames to ignore (merged with defaults) |
+
+**Returns:** `list[ShadowResult]`
+
+---
+
+## `ShadowResult`
+
+Frozen dataclass for a detected shadow file.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `path` | `Path` | Path to the shadowing file |
+| `module_name` | `str` | Name of the module being shadowed |
+| `shadows` | `str` | What it shadows: `"stdlib"` or `"installed:<pkg>"` |
+| `severity` | `Severity` | `HIGH` (stdlib) or `MEDIUM` (installed) |
+| `description` | `str` | Human-readable description |
+
+---
+
+## `Severity`
+
+Enum for shadow severity levels.
+
+| Value | Description |
+|-------|-------------|
+| `Severity.HIGH` | Shadows a stdlib module |
+| `Severity.MEDIUM` | Shadows an installed package |

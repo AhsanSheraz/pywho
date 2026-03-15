@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.3.0] - 2026-03-15
+
+### Added
+
+- `pywho scan` subcommand for project-wide shadow detection
+- Scans directory trees for `.py` files that shadow stdlib or installed packages
+- Severity levels: HIGH (stdlib) and MEDIUM (installed)
+- `--no-installed` flag to check stdlib only
+- `--json` flag for machine-readable output
+- `scan_path()` Python API with `ShadowResult` dataclass
+- Smart exclusions: skips .venv, __pycache__, node_modules, dist, build, etc.
+- Ignores common non-module files: setup.py, conftest.py, manage.py
+
 ## [0.2.0] - 2026-03-15
 
 ### Added

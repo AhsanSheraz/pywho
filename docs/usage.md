@@ -84,12 +84,66 @@ If a local file shadows a stdlib or installed package, you'll see:
 WARNING: './requests.py' shadows installed package 'requests'
 ```
 
+## Shadow scanning
+
+### Scan a project for shadows
+
+```bash
+pywho scan .
+```
+
+Recursively scans for `.py` files that shadow stdlib or installed packages.
+
+### Scan stdlib only (faster)
+
+```bash
+pywho scan . --no-installed
+```
+
+### Scan with JSON output
+
+```bash
+pywho scan . --json
+```
+
+### Scan a specific directory
+
+```bash
+pywho scan src/
+```
+
+### Scan a single file
+
+```bash
+pywho scan math.py
+```
+
+Smart exclusions — these directories are automatically skipped:
+
+- `.venv`, `venv`, `env`, `.env`
+- `__pycache__`, `.git`, `.tox`, `.mypy_cache`
+- `node_modules`, `dist`, `build`, `.eggs`
+
+Common non-module files are ignored: `setup.py`, `conftest.py`, `manage.py`, `__init__.py`.
+
+### Scan in Python code
+
+```python
+from pywho import scan_path
+from pathlib import Path
+
+results = scan_path(Path("."))
+for r in results:
+    print(f"[{r.severity.value.upper()}] {r.path} shadows {r.module_name}")
+```
+
 ## Exit codes
 
 | Code | Meaning |
 |------|---------|
-| `0`  | Success (no shadows for `trace`) |
-| `1`  | Shadows detected (for `trace`) |
+| `0`  | Success (no shadows for `trace` / `scan`) |
+| `1`  | Shadows detected (for `trace` / `scan`) |
+| `2`  | Error (e.g., path does not exist for `scan`) |
 
 ## Python library
 

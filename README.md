@@ -1,12 +1,85 @@
-# pywho
+<p align="center">
+  <b>pywho</b><br>
+  <i>One command to explain your Python environment, trace imports, and detect shadows.</i>
+</p>
 
-**One command to explain your Python environment and trace import resolution.**
+<p align="center">
+  <a href="https://github.com/AhsanSheraz/pywho/actions/workflows/ci.yml"><img src="https://github.com/AhsanSheraz/pywho/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://pypi.org/project/pywho/"><img src="https://img.shields.io/pypi/v/pywho.svg" alt="PyPI version"></a>
+  <a href="https://pypi.org/project/pywho/"><img src="https://img.shields.io/pypi/pyversions/pywho.svg" alt="Python versions"></a>
+  <a href="https://github.com/AhsanSheraz/pywho/blob/main/LICENSE"><img src="https://img.shields.io/pypi/l/pywho.svg" alt="License"></a>
+  <a href="https://pypi.org/project/pywho/"><img src="https://img.shields.io/pypi/dm/pywho.svg" alt="Downloads"></a>
+</p>
 
-Ever asked *"Which Python am I running? Why is it using that venv? Why did `import X` load that file?"* — pywho answers all of it instantly.
+---
+
+Ever asked *"Which Python am I running? Why did `import X` load that file? Do I have any files shadowing real modules?"* — **pywho** answers all of it instantly.
+
+## Quick Reference
+
+| Command | Description |
+|---------|-------------|
+| `pywho` | Show a full report of your Python environment |
+| `pywho --json` | Output environment report as JSON |
+| `pywho --packages` | Include all installed packages in the report |
+| `pywho --no-pip` | Skip pip version detection (faster) |
+| `pywho trace <module>` | Trace where an import resolves and show search order |
+| `pywho trace <module> --verbose` | Trace with full sys.path search log |
+| `pywho trace <module> --json` | Trace output as JSON |
+| `pywho scan .` | Scan project for files that shadow stdlib/installed packages |
+| `pywho scan . --no-installed` | Scan against stdlib only (skip installed packages) |
+| `pywho scan . --json` | Scan output as JSON |
+| `python -m pywho` | Run as a Python module |
+
+## Table of Contents
+
+- [Getting Started](#getting-started)
+- [Why pywho?](#why-pywho)
+- [Usage](#usage)
+  - [Environment Inspection](#environment-inspection)
+  - [Import Tracing](#import-tracing)
+  - [Shadow Scanning](#shadow-scanning)
+- [Python API](#python-api)
+- [What It Detects](#what-it-detects)
+- [Use Cases](#use-cases)
+- [Platforms](#platforms)
+- [Development](#development)
+- [License](#license)
+
+## Getting Started
+
+```bash
+pip install pywho
+```
+
+Or with [uv](https://docs.astral.sh/uv/):
+
+```bash
+uv pip install pywho
+```
+
+Or run without installing:
+
+```bash
+uvx pywho
+```
+
+## Why pywho?
+
+- **"Works on my machine"** is the #1 debugging friction in Python. pywho kills it with one command.
+- **Paste the output** into a GitHub issue, Slack message, or Stack Overflow question. Done.
+- **Zero dependencies.** Pure stdlib. Works everywhere Python runs.
+- **Cross-platform.** Linux, macOS, Windows. Python 3.9+.
+
+## Usage
+
+### Environment Inspection
+
+```bash
+pywho
+```
 
 ```
-$ pywho
-
   pywho - Python Environment Inspector
   ==============================================
 
@@ -28,7 +101,7 @@ $ pywho
 
   Paths
     Prefix:        /Users/dev/myproject/.venv
-    Base Prefix:   /opt/homebrew/Cellar/python@3.12/3.12.3/Frameworks/Python.framework/Versions/3.12
+    Base Prefix:   /opt/homebrew/Cellar/python@3.12/...
     Site-packages: /Users/dev/myproject/.venv/lib/python3.12/site-packages
 
   Package Manager
@@ -37,86 +110,38 @@ $ pywho
 
   sys.path
     [0] (empty string = cwd)
-    [1] /opt/homebrew/Cellar/python@3.12/3.12.3/Frameworks/Python.framework/Versions/3.12/lib/python312.zip
-    [2] /opt/homebrew/Cellar/python@3.12/3.12.3/Frameworks/Python.framework/Versions/3.12/lib/python3.12
+    [1] /opt/homebrew/.../python312.zip
+    [2] /opt/homebrew/.../python3.12
     ...
 ```
 
-## Why pywho?
-
-- **"Works on my machine"** is the #1 debugging friction in Python. pywho kills it with one command.
-- **Paste the output** into a GitHub issue, Slack message, or Stack Overflow question. Done.
-- **Zero dependencies.** Pure stdlib. Works everywhere Python runs.
-- **Cross-platform.** Linux, macOS, Windows. Python 3.9+.
-
-## Installation
-
-```bash
-pip install pywho
-```
-
-Or with [uv](https://docs.astral.sh/uv/):
-
-```bash
-uv pip install pywho
-```
-
-Or run without installing:
-
-```bash
-uvx pywho
-```
-
-## Usage
-
-### Basic inspection
-
-```bash
-pywho
-```
-
-### JSON output (for CI, scripts, sharing)
+#### JSON output (for CI, scripts, sharing)
 
 ```bash
 pywho --json
 ```
 
-```json
-{
-  "interpreter": {
-    "executable": "/usr/bin/python3",
-    "version": "3.11.6",
-    "implementation": "CPython",
-    ...
-  },
-  "venv": {
-    "is_active": false,
-    "type": "none",
-    ...
-  },
-  ...
-}
-```
-
-### Include installed packages
+#### Include installed packages
 
 ```bash
 pywho --packages
 ```
 
-### Skip pip version check (faster)
+#### Skip pip version check (faster)
 
 ```bash
 pywho --no-pip
 ```
 
-### Run as module
+#### Run as module
 
 ```bash
 python -m pywho
 ```
 
-### Trace an import
+### Import Tracing
+
+Trace exactly where an import resolves and why:
 
 ```bash
 pywho trace requests
@@ -136,19 +161,19 @@ pywho trace requests
     [2] ~/.venv/lib/.../site-packages -> FOUND
 ```
 
-### Trace with full search log
+#### Full search log
 
 ```bash
 pywho trace json --verbose
 ```
 
-### Trace with JSON output
+#### JSON trace output
 
 ```bash
 pywho trace requests --json
 ```
 
-### Detect import shadows
+#### Shadow detection (single module)
 
 ```bash
 $ pywho trace requests
@@ -156,7 +181,39 @@ $ pywho trace requests
   WARNING: './requests.py' shadows installed package 'requests'
 ```
 
-## As a Python library
+### Shadow Scanning
+
+Scan an entire project for files that shadow stdlib or installed packages:
+
+```bash
+$ pywho scan .
+
+  Found 2 shadow(s)
+    2 HIGH (stdlib)
+
+  [HIGH] math.py
+         shadows stdlib module 'math'
+  [HIGH] json.py
+         shadows stdlib module 'json'
+```
+
+#### Scan with JSON output
+
+```bash
+pywho scan . --json
+```
+
+#### Scan stdlib only (skip installed packages)
+
+```bash
+pywho scan . --no-installed
+```
+
+Smart exclusions — these directories are automatically skipped: `.venv`, `__pycache__`, `node_modules`, `dist`, `build`, `.git`, and more.
+
+## Python API
+
+### Environment inspection
 
 ```python
 from pywho import inspect_environment
@@ -172,7 +229,7 @@ print(report.package_manager)   # "uv"
 data = report.to_dict()
 ```
 
-### Trace imports programmatically
+### Import tracing
 
 ```python
 from pywho import trace_import
@@ -183,13 +240,23 @@ print(trace.module_type)      # ModuleType.THIRD_PARTY
 print(trace.is_cached)        # True
 print(trace.shadows)          # [] (empty = no shadows)
 
-# Check for shadows
 if trace.shadows:
     for s in trace.shadows:
         print(f"WARNING: {s.description}")
 ```
 
-## What it detects
+### Shadow scanning
+
+```python
+from pywho import scan_path
+from pathlib import Path
+
+results = scan_path(Path("."))
+for r in results:
+    print(f"[{r.severity.value.upper()}] {r.path} shadows {r.module_name}")
+```
+
+## What It Detects
 
 ### Interpreters
 - CPython, PyPy, and other implementations
@@ -197,6 +264,7 @@ if trace.shadows:
 - Build date
 
 ### Virtual environments
+
 | Type | Detection method |
 |------|-----------------|
 | **venv** | `sys.prefix != sys.base_prefix` |
@@ -217,29 +285,34 @@ Detects: pip, uv, conda, poetry, pipenv, pyenv
 ### Packages
 With `--packages`: lists all installed packages with versions and locations.
 
-## Use cases
+### Import shadows
+- Single-module detection via `pywho trace`
+- Project-wide scanning via `pywho scan`
+- Severity levels: **HIGH** (stdlib) and **MEDIUM** (installed)
 
-- **Debugging**: Paste `pywho --json` output into bug reports
-- **Onboarding**: New team member runs `pywho` to verify their setup
-- **CI/CD**: Add `pywho --json` to your pipeline for environment snapshots
-- **Support**: Ask users to run `pywho` instead of 5 separate commands
+## Use Cases
+
+| Scenario | Command |
+|----------|---------|
+| Debug "works on my machine" | `pywho --json` → paste into issue |
+| Verify onboarding setup | `pywho` |
+| CI environment snapshots | `pywho --json --packages > env.json` |
+| Find why an import is wrong | `pywho trace <module>` |
+| Audit project for shadows | `pywho scan .` |
+| Ask users for their env | "Please run `pywho`" |
 
 ## Platforms
 
 | Platform | Status |
 |----------|--------|
-| Linux | Supported |
-| macOS | Supported |
-| Windows | Supported |
+| Linux | ✅ Supported |
+| macOS | ✅ Supported |
+| Windows | ✅ Supported |
 
 | Python | Status |
 |--------|--------|
-| 3.9 | Supported |
-| 3.10 | Supported |
-| 3.11 | Supported |
-| 3.12 | Supported |
-| 3.13 | Supported |
-| 3.14 | Supported |
+| 3.9+ | ✅ Supported |
+| 3.10 – 3.14 | ✅ Tested in CI |
 
 ## Development
 
@@ -254,4 +327,4 @@ mypy src/pywho
 
 ## License
 
-MIT
+[MIT](LICENSE)
