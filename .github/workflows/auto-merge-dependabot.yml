@@ -15,7 +15,14 @@ jobs:
     runs-on: ubuntu-latest
     if: github.actor == 'dependabot[bot]'
     steps:
+      - name: Fetch Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Approve PR
+        if: steps.metadata.outputs.update-type == 'version-update:semver-patch'
         run: gh pr review --approve "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
@@ -24,6 +31,7 @@ jobs:
       # Note: PRs that modify .github/workflows/ files cannot be auto-merged
       # with GITHUB_TOKEN due to GitHub security restrictions. Those need manual merge.
       - name: Enable auto-merge
+        if: steps.metadata.outputs.update-type == 'version-update:semver-patch'
         run: gh pr merge --auto --squash "$PR_URL" || echo "Auto-merge not available for this PR (may modify workflow files)"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
