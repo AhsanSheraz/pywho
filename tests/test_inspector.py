@@ -4,7 +4,11 @@ from __future__ import annotations
 
 import os
 import platform
+import site
+import subprocess
 import sys
+from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -14,6 +18,8 @@ from pywho.inspector import (
     VenvInfo,
     _detect_package_manager,
     _detect_venv,
+    _get_installed_packages,
+    _get_pip_version,
     _get_site_packages,
     inspect_environment,
 )
@@ -65,7 +71,6 @@ class TestInspectEnvironment:
 
     def test_packages_included_when_requested(self) -> None:
         report = inspect_environment(include_packages=True)
-        # Should have at least pip and pytest
         assert len(report.packages) > 0
         names = {p.name.lower() for p in report.packages}
         assert "pytest" in names
@@ -92,9 +97,107 @@ class TestVenvDetection:
         if sys.prefix != sys.base_prefix:
             assert venv.is_active is True
         else:
-            # Could still be conda
             if not os.environ.get("CONDA_DEFAULT_ENV"):
                 assert venv.is_active is False
+
+    def test_conda_detection(self) -> None:
+        with patch.dict(os.environ, {"CONDA_DEFAULT_ENV": "base", "CONDA_PREFIX": "/opt/conda"}):
+            venv = _detect_venv()
+            assert venv.type == "conda"
+            assert venv.is_active is True
+            assert venv.path == "/opt/conda"
+
+    def test_pipenv_detection(self) -> None:
+        with patch.dict(os.environ, {"PIPENV_ACTIVE": "1"}, clear=False):
+            venv = _detect_venv()
+            assert venv.type == "pipenv"
+            assert venv.is_active is True
+
+    def test_no_venv_when_prefix_equals_base(self) -> None:
+        env_clean = {k: v for k, v in os.environ.items()
+                     if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
+        with patch.dict(os.environ, env_clean, clear=True), \
+             patch.object(sys, "prefix", sys.base_prefix):
+            venv = _detect_venv()
+            assert venv.is_active is False
+            assert venv.type == "none"
+
+    def test_virtualenv_detection(self, tmp_path: Path) -> None:
+        fake_prefix = str(tmp_path / "fakevenv")
+        # Create orig-prefix.txt in both Unix and Windows locations
+        unix_lib = tmp_path / "fakevenv" / "lib" / f"python{sys.version_info.major}.{sys.version_info.minor}"
+        unix_lib.mkdir(parents=True)
+        (unix_lib / "orig-prefix.txt").write_text("/usr")
+        win_lib = tmp_path / "fakevenv" / "Lib"
+        win_lib.mkdir(parents=True, exist_ok=True)
+        (win_lib / "orig-prefix.txt").write_text("/usr")
+        (tmp_path / "fakevenv" / "pyvenv.cfg").write_text("home = /usr/bin\n")
+
+        env_clean = {k: v for k, v in os.environ.items()
+                     if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
+        with patch.dict(os.environ, env_clean, clear=True), \
+             patch.object(sys, "prefix", fake_prefix), \
+             patch.object(sys, "base_prefix", "/usr"):
+            venv = _detect_venv()
+            assert venv.type == "virtualenv"
+            assert venv.is_active is True
+
+    def test_uv_venv_detection(self, tmp_path: Path) -> None:
+        fake_prefix = str(tmp_path / "uvvenv")
+        (tmp_path / "uvvenv").mkdir()
+        (tmp_path / "uvvenv" / "pyvenv.cfg").write_text("home = /usr/bin\nuv = 0.1.0\nprompt = myproject\n")
+
+        env_clean = {k: v for k, v in os.environ.items()
+                     if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
+        with patch.dict(os.environ, env_clean, clear=True), \
+             patch.object(sys, "prefix", fake_prefix), \
+             patch.object(sys, "base_prefix", "/usr"):
+            venv = _detect_venv()
+            assert venv.type == "uv"
+            assert venv.prompt == "myproject"
+
+    def test_poetry_venv_detection(self, tmp_path: Path) -> None:
+        fake_prefix = str(tmp_path / "poetryvenv")
+        (tmp_path / "poetryvenv").mkdir()
+
+        with patch.dict(os.environ, {"POETRY_ACTIVE": "1"}, clear=False), \
+             patch.object(sys, "prefix", fake_prefix), \
+             patch.object(sys, "base_prefix", "/usr"):
+            venv = _detect_venv()
+            assert venv.type == "poetry"
+
+    def test_pyvenv_cfg_read_error(self, tmp_path: Path) -> None:
+        fake_prefix = str(tmp_path / "badvenv")
+        (tmp_path / "badvenv").mkdir()
+        cfg = tmp_path / "badvenv" / "pyvenv.cfg"
+        cfg.write_text("home = /usr\n")
+
+        env_clean = {k: v for k, v in os.environ.items()
+                     if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
+        with patch.dict(os.environ, env_clean, clear=True), \
+             patch.object(sys, "prefix", fake_prefix), \
+             patch.object(sys, "base_prefix", "/usr"), \
+             patch.object(Path, "read_text", side_effect=OSError("permission denied")):
+            venv = _detect_venv()
+            assert venv.is_active is True
+
+    def test_windows_virtualenv_detection(self, tmp_path: Path) -> None:
+        fake_prefix = str(tmp_path / "winvenv")
+        # Create both Unix and Windows orig-prefix.txt locations
+        win_lib = tmp_path / "winvenv" / "Lib"
+        win_lib.mkdir(parents=True)
+        (win_lib / "orig-prefix.txt").write_text("C:\\Python312")
+        unix_lib = tmp_path / "winvenv" / "lib" / f"python{sys.version_info.major}.{sys.version_info.minor}"
+        unix_lib.mkdir(parents=True)
+        (unix_lib / "orig-prefix.txt").write_text("C:\\Python312")
+
+        env_clean = {k: v for k, v in os.environ.items()
+                     if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
+        with patch.dict(os.environ, env_clean, clear=True), \
+             patch.object(sys, "prefix", fake_prefix), \
+             patch.object(sys, "base_prefix", "C:\\Python312"):
+            venv = _detect_venv()
+            assert venv.type == "virtualenv"
 
 
 class TestSitePackages:
@@ -104,6 +207,16 @@ class TestSitePackages:
         result = _get_site_packages()
         assert isinstance(result, list)
 
+    def test_no_getsitepackages_attribute(self) -> None:
+        with patch.object(site, "getsitepackages", side_effect=AttributeError):
+            result = _get_site_packages()
+            assert isinstance(result, list)
+
+    def test_user_site_nonexistent_directory(self) -> None:
+        with patch.object(site, "getusersitepackages", return_value="/nonexistent/path"):
+            result = _get_site_packages()
+            assert isinstance(result, list)
+
 
 class TestPackageManager:
     """Test package manager detection."""
@@ -112,6 +225,91 @@ class TestPackageManager:
         result = _detect_package_manager()
         assert isinstance(result, str)
         assert result in ("pip", "conda", "pipenv", "poetry", "uv", "pyenv")
+
+    def test_conda_manager(self) -> None:
+        with patch.dict(os.environ, {"CONDA_DEFAULT_ENV": "base"}):
+            assert _detect_package_manager() == "conda"
+
+    def test_pipenv_manager(self) -> None:
+        env = {k: v for k, v in os.environ.items() if k != "CONDA_DEFAULT_ENV"}
+        env["PIPENV_ACTIVE"] = "1"
+        with patch.dict(os.environ, env, clear=True):
+            assert _detect_package_manager() == "pipenv"
+
+    def test_poetry_manager(self) -> None:
+        env = {k: v for k, v in os.environ.items()
+               if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE")}
+        env["POETRY_ACTIVE"] = "1"
+        with patch.dict(os.environ, env, clear=True):
+            assert _detect_package_manager() == "poetry"
+
+    def test_pyenv_manager(self) -> None:
+        env = {k: v for k, v in os.environ.items()
+               if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
+        with patch.dict(os.environ, env, clear=True), \
+             patch.object(sys, "executable", "/home/user/.pyenv/shims/python"):
+            with patch("pywho.inspector.Path") as MockPath:
+                cfg = MagicMock()
+                cfg.exists.return_value = False
+                MockPath.return_value.__truediv__ = lambda self, other: cfg
+                assert _detect_package_manager() == "pyenv"
+
+    def test_uv_manager(self, tmp_path: Path) -> None:
+        cfg = tmp_path / "pyvenv.cfg"
+        cfg.write_text("uv = 0.5.0\n")
+        env = {k: v for k, v in os.environ.items()
+               if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
+        with patch.dict(os.environ, env, clear=True), \
+             patch.object(sys, "prefix", str(tmp_path)):
+            assert _detect_package_manager() == "uv"
+
+    def test_uv_manager_cfg_read_error(self, tmp_path: Path) -> None:
+        cfg = tmp_path / "pyvenv.cfg"
+        cfg.write_text("uv = 0.5\n")
+        env = {k: v for k, v in os.environ.items()
+               if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
+        with patch.dict(os.environ, env, clear=True), \
+             patch.object(sys, "prefix", str(tmp_path)), \
+             patch.object(sys, "executable", "/usr/bin/python"), \
+             patch.object(Path, "read_text", side_effect=OSError("permission denied")):
+            assert _detect_package_manager() == "pip"
+
+
+class TestPipVersion:
+    """Test pip version detection."""
+
+    def test_returns_string_or_none(self) -> None:
+        result = _get_pip_version()
+        assert result is None or isinstance(result, str)
+
+    def test_timeout_returns_none(self) -> None:
+        with patch("pywho.inspector.subprocess.run", side_effect=subprocess.TimeoutExpired(cmd="pip", timeout=5)):
+            assert _get_pip_version() is None
+
+    def test_file_not_found_returns_none(self) -> None:
+        with patch("pywho.inspector.subprocess.run", side_effect=FileNotFoundError):
+            assert _get_pip_version() is None
+
+    def test_nonzero_returncode_returns_none(self) -> None:
+        mock_result = MagicMock()
+        mock_result.returncode = 1
+        with patch("pywho.inspector.subprocess.run", return_value=mock_result):
+            assert _get_pip_version() is None
+
+
+class TestInstalledPackages:
+    """Test installed packages listing."""
+
+    def test_returns_sorted_list(self) -> None:
+        pkgs = _get_installed_packages()
+        assert isinstance(pkgs, list)
+        if len(pkgs) > 1:
+            names = [p.name.lower() for p in pkgs]
+            assert names == sorted(names)
+
+    def test_handles_exception(self) -> None:
+        with patch("importlib.metadata.distributions", side_effect=Exception("boom")):
+            assert _get_installed_packages() == []
 
 
 class TestToDict:
@@ -139,7 +337,6 @@ class TestToDict:
         import json
         report = inspect_environment(include_packages=True)
         d = report.to_dict()
-        # Should not raise
         json_str = json.dumps(d)
         assert isinstance(json_str, str)
 

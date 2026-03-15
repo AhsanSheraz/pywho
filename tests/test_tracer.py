@@ -5,13 +5,17 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 from pywho.tracer import (
     ModuleType,
+    PathSearchEntry,
     SearchResult,
     TraceReport,
+    _classify_module,
+    _detect_shadows,
     trace_import,
 )
 
@@ -67,16 +71,13 @@ class TestTraceShadows:
     """Test shadow detection."""
 
     def test_detects_stdlib_shadow(self, tmp_path: Path) -> None:
-        # Create a json.py in a temp directory
         shadow_file = tmp_path / "json.py"
         shadow_file.write_text("# shadow")
 
-        # Prepend tmp_path to sys.path
         original_path = sys.path.copy()
         sys.path.insert(0, str(tmp_path))
         try:
             report = trace_import("json")
-            # The search log should show the shadow found first
             found = [e for e in report.search_log if e.result == SearchResult.FOUND]
             assert len(found) >= 2
             assert str(tmp_path) in found[0].path
@@ -85,7 +86,6 @@ class TestTraceShadows:
 
     def test_no_shadow_for_clean_module(self) -> None:
         report = trace_import("os")
-        # os shouldn't have shadows in a normal environment
         stdlib_shadows = [s for s in report.shadows if "shadows stdlib" in s.description]
         assert len(stdlib_shadows) == 0
 
@@ -113,12 +113,10 @@ class TestTraceCached:
     """Test cache detection."""
 
     def test_cached_module(self) -> None:
-        # os is always in sys.modules
         report = trace_import("os")
         assert report.is_cached is True
 
     def test_uncached_module(self) -> None:
-        # Remove a module from sys.modules temporarily
         mod_name = "pywho.tracer"
         original = sys.modules.pop(mod_name, None)
         try:
@@ -146,3 +144,42 @@ class TestTraceReport:
         d = report.to_dict()
         json_str = json.dumps(d)
         assert isinstance(json_str, str)
+
+
+class TestClassifyModule:
+    """Test module classification."""
+
+    def test_classify_frozen_module(self) -> None:
+        spec = MagicMock()
+        spec.origin = "frozen"
+        assert _classify_module("_frozen_importlib", spec) == ModuleType.FROZEN
+
+    def test_classify_stdlib_by_name(self) -> None:
+        spec = MagicMock()
+        spec.origin = "/some/path/json/__init__.py"
+        assert _classify_module("json", spec) in (ModuleType.STDLIB, ModuleType.LOCAL)
+
+
+class TestDetectShadows:
+    """Test shadow detection logic."""
+
+    def test_no_shadow_with_single_found(self) -> None:
+        log = [
+            PathSearchEntry(path="/usr/lib/python3.12", result=SearchResult.FOUND, candidate="/usr/lib/python3.12/json/__init__.py"),
+            PathSearchEntry(path="/tmp", result=SearchResult.NOT_FOUND),
+        ]
+        shadows = _detect_shadows("json", log, ModuleType.STDLIB)
+        assert len(shadows) == 0
+
+    def test_local_shadows_third_party(self) -> None:
+        log = [
+            PathSearchEntry(path="/project", result=SearchResult.FOUND, candidate="/project/requests.py"),
+            PathSearchEntry(path="/usr/lib/python3.12/site-packages", result=SearchResult.FOUND, candidate="/usr/lib/python3.12/site-packages/requests/__init__.py"),
+        ]
+        shadows = _detect_shadows("requests", log, ModuleType.LOCAL)
+        assert len(shadows) >= 1
+
+    def test_find_spec_value_error(self) -> None:
+        with patch("pywho.tracer.importlib.util.find_spec", side_effect=ValueError("bad")):
+            report = trace_import("some.bad.module")
+            assert report.module_type == ModuleType.NOT_FOUND

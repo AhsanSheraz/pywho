@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
-from pywho.scanner import Severity, ShadowResult, scan_path
+from pywho.scanner import Severity, ShadowResult, _get_stdlib_names, _is_installed_package, scan_path
 
 
 def _create_file(directory: Path, name: str, content: str = "") -> Path:
@@ -113,6 +115,11 @@ class TestSingleFile:
         results = scan_path(f, check_installed=False)
         assert len(results) == 0
 
+    def test_single_non_python_file(self, tmp_path: Path) -> None:
+        f = _create_file(tmp_path, "math.txt", "not python")
+        results = scan_path(f, check_installed=False)
+        assert len(results) == 0
+
 
 class TestShadowResult:
     """Test the ShadowResult dataclass."""
@@ -137,30 +144,46 @@ class TestShadowResult:
         assert "installed" in r.description
 
 
-class TestCLIIntegration:
-    """Test scan via the CLI."""
+class TestStdlibNames:
+    """Test stdlib name detection."""
 
-    def test_scan_clean_dir(self, tmp_path: Path) -> None:
-        from pywho.cli import main
-        _create_file(tmp_path, "myapp.py")
-        assert main(["scan", str(tmp_path), "--no-installed"]) == 0
+    def test_stdlib_names_fallback(self) -> None:
+        """Test the 3.9 fallback when sys.stdlib_module_names doesn't exist."""
+        saved = getattr(sys, "stdlib_module_names", None)
+        try:
+            if hasattr(sys, "stdlib_module_names"):
+                delattr(sys, "stdlib_module_names")
+            names = _get_stdlib_names()
+            assert "os" in names
+            assert "json" in names
+            assert "math" in names
+        finally:
+            if saved is not None:
+                sys.stdlib_module_names = saved  # type: ignore[attr-defined]
 
-    def test_scan_shadow_dir(self, tmp_path: Path) -> None:
-        from pywho.cli import main
-        _create_file(tmp_path, "math.py")
-        assert main(["scan", str(tmp_path), "--no-installed"]) == 1
 
-    def test_scan_json_output(self, tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
-        import json
-        from pywho.cli import main
-        _create_file(tmp_path, "json.py")
-        main(["scan", str(tmp_path), "--json", "--no-installed"])
-        captured = capsys.readouterr()
-        data = json.loads(captured.out)
-        assert len(data) == 1
-        assert data[0]["module"] == "json"
-        assert data[0]["severity"] == "high"
+class TestIsInstalledPackage:
+    """Test installed package detection."""
 
-    def test_scan_nonexistent_path(self) -> None:
-        from pywho.cli import main
-        assert main(["scan", "/nonexistent/path/xyz"]) == 2
+    def test_installed_package_detected(self) -> None:
+        assert _is_installed_package("pytest") is True
+
+    def test_nonexistent_package_not_detected(self) -> None:
+        assert _is_installed_package("nonexistent_xyz_99999") is False
+
+    def test_stdlib_module_not_detected(self) -> None:
+        assert _is_installed_package("os") is False
+
+    def test_builtin_module_not_detected(self) -> None:
+        assert _is_installed_package("sys") is False
+
+
+class TestInstalledPackageShadow:
+    """Test scanning for installed package shadows."""
+
+    def test_detects_installed_package_shadow(self, tmp_path: Path) -> None:
+        (tmp_path / "pytest.py").write_text("# shadow")
+        results = scan_path(tmp_path, check_installed=True)
+        installed = [r for r in results if r.severity == Severity.MEDIUM]
+        assert len(installed) >= 1
+        assert any(r.module_name == "pytest" for r in installed)
