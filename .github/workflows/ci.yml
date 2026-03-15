@@ -34,7 +34,7 @@ jobs:
         run: uv pip install --system -e ".[dev]"
 
       - name: Run tests
-        run: pytest -v --cov=pywho --cov-report=xml
+        run: pytest -v --cov=pywho --cov-report=xml --cov-fail-under=95
 
       - name: Upload coverage
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
