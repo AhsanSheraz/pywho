@@ -1,4 +1,4 @@
-.PHONY: help install dev test lint format typecheck build publish clean docs
+.PHONY: help install dev test lint format fix-code typecheck build publish clean docs
 
 help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
@@ -19,6 +19,15 @@ lint: ## Run linter
 format: ## Format code
 	ruff check --fix src/ tests/
 	ruff format src/ tests/
+
+fix-code: ## Fix unused imports, sort imports, and reformat code
+	@echo "Removing unused imports..."
+	ruff check src/ tests/ --select F401 --fix
+	@echo "Sorting imports..."
+	ruff check src/ tests/ --select I --fix
+	@echo "Running code formatter..."
+	ruff format src/ tests/
+	@echo "Done! Code is clean."
 
 typecheck: ## Run type checker
 	mypy src/pywho

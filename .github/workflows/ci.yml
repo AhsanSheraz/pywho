@@ -86,6 +86,9 @@ jobs:
       - name: Ruff check
         run: ruff check src/ tests/
 
+      - name: Ruff format check
+        run: ruff format --check src/ tests/
+
   type-check:
     runs-on: ubuntu-latest
     steps:
