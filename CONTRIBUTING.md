@@ -1,99 +1,67 @@
 # Contributing to pywho
 
-Thanks for your interest in contributing to pywho! This document provides guidelines and instructions for contributing.
+Thanks for your interest in contributing! Here's how to get started.
 
 ## Development setup
-
-1. Fork and clone the repository:
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/pywho.git
 cd pywho
-```
-
-2. Create a virtual environment and install dependencies:
-
-```bash
-uv venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+uv venv && source .venv/bin/activate  # Windows: .venv\Scripts\activate
 uv pip install -e ".[dev]"
-```
-
-3. Install pre-commit hooks:
-
-```bash
-pip install pre-commit
 pre-commit install
 ```
 
-## Running tests
+## Running checks
 
 ```bash
-# Run all tests
-make test
-
-# Run with verbose output
-pytest -v
-
-# Run a specific test
-pytest tests/test_inspector.py::TestVenvDetection -v
+pytest -v          # Run tests
+mypy src/pywho     # Type check
+ruff check src/ tests/   # Lint
+ruff format src/ tests/  # Format
 ```
 
-## Code quality
+Or use the Makefile shortcuts:
 
 ```bash
-# Run linter
-make lint
-
-# Auto-format code
-make format
-
-# Run type checker
-make typecheck
-
-# Run everything
-make all
+make test       # Tests
+make typecheck  # mypy
+make lint       # ruff check
+make format     # ruff format
+make all        # Everything
 ```
 
 ## Making changes
 
-1. Create a branch for your change:
+1. Fork the repo and create a feature branch from `main`
+2. Make your changes
+3. Add or update tests as needed
+4. Ensure all checks pass
+5. Commit using [Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `docs:`, `test:`, `chore:`
+6. Open a pull request against `main`
 
-```bash
-git checkout -b your-feature-name
-```
+## Pull request guidelines
 
-2. Make your changes and ensure:
-   - All tests pass (`make test`)
-   - Code is formatted (`make format`)
-   - Linter passes (`make lint`)
-   - Type checker passes (`make typecheck`)
-
-3. Commit your changes with a clear message:
-
-```bash
-git commit -m "feat: add support for ..."
-```
-
-We follow [Conventional Commits](https://www.conventionalcommits.org/):
-- `feat:` for new features
-- `fix:` for bug fixes
-- `docs:` for documentation changes
-- `test:` for test additions/changes
-- `chore:` for maintenance tasks
-
-4. Push and open a pull request.
+- Keep PRs focused — one feature or fix per PR
+- Add tests for new functionality
+- Update documentation if you're changing user-facing behavior
+- Update `CHANGELOG.md` for user-facing changes
 
 ## Adding support for a new venv type
-
-To add detection for a new virtual environment manager:
 
 1. Add detection logic in `src/pywho/inspector.py` in the `_detect_venv()` function
 2. Add the type string to the `VenvInfo.type` field documentation
 3. Add a test in `tests/test_inspector.py`
 4. Update the README table
 
-## Reporting issues
+## Reporting bugs
 
-- Use the [GitHub issue tracker](https://github.com/AhsanSheraz/pywho/issues)
-- Include the output of `pywho --json` when reporting environment-related issues
+Use the [bug report template](https://github.com/AhsanSheraz/pywho/issues/new?template=bug_report.md) and include the output of `pywho --json`.
+
+## Suggesting features
+
+Open an issue using the [feature request template](https://github.com/AhsanSheraz/pywho/issues/new?template=feature_request.md).
+
+## Code of conduct
+
+Be respectful, constructive, and welcoming. We're all here to make Python debugging easier.

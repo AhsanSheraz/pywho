@@ -9,6 +9,7 @@
   <a href="https://pypi.org/project/pywho/"><img src="https://img.shields.io/pypi/pyversions/pywho.svg" alt="Python versions"></a>
   <a href="https://github.com/AhsanSheraz/pywho/blob/main/LICENSE"><img src="https://img.shields.io/pypi/l/pywho.svg" alt="License"></a>
   <a href="https://pypi.org/project/pywho/"><img src="https://img.shields.io/pypi/dm/pywho.svg" alt="Downloads"></a>
+  <a href="https://codecov.io/gh/AhsanSheraz/pywho"><img src="https://codecov.io/gh/AhsanSheraz/pywho/branch/main/graph/badge.svg" alt="Coverage"></a>
 </p>
 
 ---
