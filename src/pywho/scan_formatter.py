@@ -2,55 +2,31 @@
 
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-from typing import List
+from typing import TYPE_CHECKING
 
-from pywho.scanner import ShadowResult, Severity
+from pywho._terminal import BOLD, DIM, GREEN, RED, WHITE, YELLOW
+from pywho._terminal import colorize as _c
+from pywho.scanner import Severity, ShadowResult
 
-
-# ANSI escape codes
-_BOLD = "\033[1m"
-_DIM = "\033[2m"
-_RESET = "\033[0m"
-_CYAN = "\033[36m"
-_GREEN = "\033[32m"
-_YELLOW = "\033[33m"
-_RED = "\033[91m"
-_WHITE = "\033[37m"
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
-def _supports_color() -> bool:
-    if hasattr(sys.stdout, "isatty") and sys.stdout.isatty():
-        return True
-    if "ANSICON" in __import__("os").environ:
-        return True
-    if "WT_SESSION" in __import__("os").environ:
-        return True
-    return False
-
-
-def _c(text: str, code: str) -> str:
-    if _supports_color():
-        return f"{code}{text}{_RESET}"
-    return text
-
-
-def format_scan(results: List[ShadowResult], root: Path) -> str:
+def format_scan(results: list[ShadowResult], root: Path) -> str:
     """Format scan results for terminal display."""
     if not results:
-        return _c("\n  No shadows detected.\n", _GREEN)
+        return _c("\n  No shadows detected.\n", GREEN)
 
-    lines: List[str] = []
+    lines: list[str] = []
     high = sum(1 for r in results if r.severity == Severity.HIGH)
     medium = sum(1 for r in results if r.severity == Severity.MEDIUM)
 
     lines.append("")
-    lines.append(_c(f"  Found {len(results)} shadow(s)", _BOLD + _WHITE))
+    lines.append(_c(f"  Found {len(results)} shadow(s)", BOLD + WHITE))
     if high:
-        lines.append(_c(f"    {high} HIGH (stdlib)", _RED))
+        lines.append(_c(f"    {high} HIGH (stdlib)", RED))
     if medium:
-        lines.append(_c(f"    {medium} MEDIUM (installed)", _YELLOW))
+        lines.append(_c(f"    {medium} MEDIUM (installed)", YELLOW))
     lines.append("")
 
     for result in results:
@@ -60,12 +36,12 @@ def format_scan(results: List[ShadowResult], root: Path) -> str:
             rel = result.path
 
         if result.severity == Severity.HIGH:
-            tag = _c("HIGH", _BOLD + _RED)
+            tag = _c("HIGH", BOLD + RED)
         else:
-            tag = _c("MEDIUM", _BOLD + _YELLOW)
+            tag = _c("MEDIUM", BOLD + YELLOW)
 
         lines.append(f"  [{tag}] {rel}")
-        lines.append(f"         {_c(result.description, _DIM)}")
+        lines.append(f"         {_c(result.description, DIM)}")
 
     lines.append("")
     return "\n".join(lines)

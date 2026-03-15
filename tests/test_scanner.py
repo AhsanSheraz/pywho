@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from unittest.mock import patch
 
-import pytest
-
-from pywho.scanner import Severity, ShadowResult, _get_stdlib_names, _is_installed_package, scan_path
+from pywho.scanner import (
+    Severity,
+    ShadowResult,
+    _get_stdlib_names,
+    _is_installed_package,
+    scan_path,
+)
 
 
 def _create_file(directory: Path, name: str, content: str = "") -> Path:

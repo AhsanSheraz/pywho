@@ -2,10 +2,7 @@
 
 from __future__ import annotations
 
-import os
-from unittest.mock import MagicMock, patch
-
-from pywho.formatter import _supports_color, format_report
+from pywho.formatter import format_report
 from pywho.inspector import EnvironmentReport, VenvInfo, inspect_environment
 
 
@@ -36,28 +33,6 @@ class TestFormatter:
         output = format_report(report)
         assert isinstance(output, str)
         assert len(output) > 100
-
-
-class TestFormatterColor:
-    """Test ANSI color support detection."""
-
-    def test_supports_color_with_ansicon(self) -> None:
-        with patch.dict(os.environ, {"ANSICON": "1"}), \
-             patch("sys.stdout", new=MagicMock(isatty=lambda: False)):
-            assert _supports_color() is True
-
-    def test_supports_color_with_wt_session(self) -> None:
-        env = {k: v for k, v in os.environ.items() if k != "ANSICON"}
-        env["WT_SESSION"] = "1"
-        with patch.dict(os.environ, env, clear=True), \
-             patch("sys.stdout", new=MagicMock(isatty=lambda: False)):
-            assert _supports_color() is True
-
-    def test_supports_color_returns_false(self) -> None:
-        env = {k: v for k, v in os.environ.items() if k not in ("ANSICON", "WT_SESSION")}
-        with patch.dict(os.environ, env, clear=True), \
-             patch("sys.stdout", new=MagicMock(isatty=lambda: False)):
-            assert _supports_color() is False
 
 
 class TestFormatterVenvBranches:

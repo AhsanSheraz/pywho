@@ -125,7 +125,8 @@ class TestVenvDetection:
     def test_virtualenv_detection(self, tmp_path: Path) -> None:
         fake_prefix = str(tmp_path / "fakevenv")
         # Create orig-prefix.txt in both Unix and Windows locations
-        unix_lib = tmp_path / "fakevenv" / "lib" / f"python{sys.version_info.major}.{sys.version_info.minor}"
+        pyver = f"python{sys.version_info.major}.{sys.version_info.minor}"
+        unix_lib = tmp_path / "fakevenv" / "lib" / pyver
         unix_lib.mkdir(parents=True)
         (unix_lib / "orig-prefix.txt").write_text("/usr")
         win_lib = tmp_path / "fakevenv" / "Lib"
@@ -145,7 +146,8 @@ class TestVenvDetection:
     def test_uv_venv_detection(self, tmp_path: Path) -> None:
         fake_prefix = str(tmp_path / "uvvenv")
         (tmp_path / "uvvenv").mkdir()
-        (tmp_path / "uvvenv" / "pyvenv.cfg").write_text("home = /usr/bin\nuv = 0.1.0\nprompt = myproject\n")
+        cfg_text = "home = /usr/bin\nuv = 0.1.0\nprompt = myproject\n"
+        (tmp_path / "uvvenv" / "pyvenv.cfg").write_text(cfg_text)
 
         env_clean = {k: v for k, v in os.environ.items()
                      if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
@@ -187,7 +189,8 @@ class TestVenvDetection:
         win_lib = tmp_path / "winvenv" / "Lib"
         win_lib.mkdir(parents=True)
         (win_lib / "orig-prefix.txt").write_text("C:\\Python312")
-        unix_lib = tmp_path / "winvenv" / "lib" / f"python{sys.version_info.major}.{sys.version_info.minor}"
+        pyver = f"python{sys.version_info.major}.{sys.version_info.minor}"
+        unix_lib = tmp_path / "winvenv" / "lib" / pyver
         unix_lib.mkdir(parents=True)
         (unix_lib / "orig-prefix.txt").write_text("C:\\Python312")
 
@@ -247,12 +250,12 @@ class TestPackageManager:
         env = {k: v for k, v in os.environ.items()
                if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
         with patch.dict(os.environ, env, clear=True), \
-             patch.object(sys, "executable", "/home/user/.pyenv/shims/python"):
-            with patch("pywho.inspector.Path") as MockPath:
-                cfg = MagicMock()
-                cfg.exists.return_value = False
-                MockPath.return_value.__truediv__ = lambda self, other: cfg
-                assert _detect_package_manager() == "pyenv"
+             patch.object(sys, "executable", "/home/user/.pyenv/shims/python"), \
+             patch("pywho.inspector.Path") as mock_path:
+            cfg = MagicMock()
+            cfg.exists.return_value = False
+            mock_path.return_value.__truediv__ = lambda self, other: cfg
+            assert _detect_package_manager() == "pyenv"
 
     def test_uv_manager(self, tmp_path: Path) -> None:
         cfg = tmp_path / "pyvenv.cfg"
@@ -283,7 +286,8 @@ class TestPipVersion:
         assert result is None or isinstance(result, str)
 
     def test_timeout_returns_none(self) -> None:
-        with patch("pywho.inspector.subprocess.run", side_effect=subprocess.TimeoutExpired(cmd="pip", timeout=5)):
+        err = subprocess.TimeoutExpired(cmd="pip", timeout=5)
+        with patch("pywho.inspector.subprocess.run", side_effect=err):
             assert _get_pip_version() is None
 
     def test_file_not_found_returns_none(self) -> None:

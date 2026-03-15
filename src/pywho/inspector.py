@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import os
 import platform
 import site
@@ -10,7 +11,6 @@ import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional
 
 
 @dataclass(frozen=True)
@@ -28,8 +28,8 @@ class VenvInfo:
 
     is_active: bool
     type: str  # "venv", "virtualenv", "conda", "poetry", "pipenv", "uv", "none"
-    path: Optional[str]
-    prompt: Optional[str]
+    path: str | None
+    prompt: str | None
 
 
 @dataclass(frozen=True)
@@ -57,17 +57,17 @@ class EnvironmentReport:
     prefix: str
     base_prefix: str
     exec_prefix: str
-    sys_path: List[str]
-    site_packages: List[str]
+    sys_path: list[str]
+    site_packages: list[str]
 
     # Package manager hints
     package_manager: str
-    pip_version: Optional[str]
+    pip_version: str | None
 
     # Installed packages (top-level only for speed)
-    packages: List[PackageInfo] = field(default_factory=list)
+    packages: list[PackageInfo] = field(default_factory=list)
 
-    def to_dict(self) -> Dict[str, object]:
+    def to_dict(self) -> dict[str, object]:
         """Serialize to a plain dictionary for JSON output."""
         return {
             "interpreter": {
@@ -182,13 +182,11 @@ def _detect_venv() -> VenvInfo:
     )
 
 
-def _get_site_packages() -> List[str]:
+def _get_site_packages() -> list[str]:
     """Return active site-packages directories."""
-    dirs: List[str] = []
-    try:
+    dirs: list[str] = []
+    with contextlib.suppress(AttributeError):
         dirs.extend(site.getsitepackages())
-    except AttributeError:
-        pass
     user_site = site.getusersitepackages()
     if isinstance(user_site, str) and os.path.isdir(user_site):
         dirs.append(user_site)
@@ -221,7 +219,7 @@ def _detect_package_manager() -> str:
     return "pip"
 
 
-def _get_pip_version() -> Optional[str]:
+def _get_pip_version() -> str | None:
     """Get installed pip version without importing it."""
     try:
         result = subprocess.run(
@@ -240,12 +238,12 @@ def _get_pip_version() -> Optional[str]:
     return None
 
 
-def _get_installed_packages() -> List[PackageInfo]:
+def _get_installed_packages() -> list[PackageInfo]:
     """List installed packages using importlib.metadata."""
     try:
         from importlib.metadata import distributions
 
-        packages: List[PackageInfo] = []
+        packages: list[PackageInfo] = []
         seen = set()
         for dist in distributions():
             name = dist.metadata["Name"]
