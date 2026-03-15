@@ -1,8 +1,8 @@
 # pywho
 
-**One command to explain your Python environment.**
+**One command to explain your Python environment and trace import resolution.**
 
-Ever asked *"Which Python am I running? Why is it using that venv? Where are my packages?"* — pywho answers all of it instantly.
+Ever asked *"Which Python am I running? Why is it using that venv? Why did `import X` load that file?"* — pywho answers all of it instantly.
 
 ```
 $ pywho
@@ -116,6 +116,46 @@ pywho --no-pip
 python -m pywho
 ```
 
+### Trace an import
+
+```bash
+pywho trace requests
+```
+
+```
+  Import Resolution: requests
+  ========================================
+
+  Resolved to: /Users/dev/.venv/lib/python3.12/site-packages/requests/__init__.py
+  Module type: third-party (package)
+  Cached:      No
+
+  Search order:
+    [0] /Users/dev/myproject        -> not found
+    [1] /usr/lib/python3.12         -> not found
+    [2] ~/.venv/lib/.../site-packages -> FOUND
+```
+
+### Trace with full search log
+
+```bash
+pywho trace json --verbose
+```
+
+### Trace with JSON output
+
+```bash
+pywho trace requests --json
+```
+
+### Detect import shadows
+
+```bash
+$ pywho trace requests
+
+  WARNING: './requests.py' shadows installed package 'requests'
+```
+
 ## As a Python library
 
 ```python
@@ -130,6 +170,23 @@ print(report.package_manager)   # "uv"
 
 # Get JSON-serializable dict
 data = report.to_dict()
+```
+
+### Trace imports programmatically
+
+```python
+from pywho import trace_import
+
+trace = trace_import("requests")
+print(trace.resolved_path)    # /path/to/requests/__init__.py
+print(trace.module_type)      # ModuleType.THIRD_PARTY
+print(trace.is_cached)        # True
+print(trace.shadows)          # [] (empty = no shadows)
+
+# Check for shadows
+if trace.shadows:
+    for s in trace.shadows:
+        print(f"WARNING: {s.description}")
 ```
 
 ## What it detects

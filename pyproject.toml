@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pywho"
-version = "0.1.0"
-description = "One command to explain your Python environment: interpreter, venv, packages, sys.path, and more."
+version = "0.2.0"
+description = "One command to explain your Python environment and trace import resolution."
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.9"
@@ -14,7 +14,7 @@ authors = [
 ]
 keywords = [
     "python", "environment", "debug", "venv", "virtualenv",
-    "interpreter", "diagnostic", "cli", "devtools",
+    "interpreter", "diagnostic", "cli", "devtools", "import", "trace",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",

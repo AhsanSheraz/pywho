@@ -96,3 +96,69 @@ Frozen dataclass for an installed package.
 | `name` | `str` | Package name |
 | `version` | `str` | Installed version |
 | `location` | `str` | Installation path |
+
+---
+
+## `trace_import`
+
+```python
+from pywho import trace_import
+
+report = trace_import("requests", verbose=False)
+```
+
+**Parameters:**
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `module_name` | `str` | *(required)* | Module to trace (e.g., `"requests"`, `"os.path"`) |
+| `verbose` | `bool` | `False` | Include all sys.path entries in search log |
+
+**Returns:** `TraceReport`
+
+---
+
+## `TraceReport`
+
+Frozen dataclass containing the full import resolution trace.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `module_name` | `str` | The module that was traced |
+| `resolved_path` | `str \| None` | File path the import resolves to (`None` if not found) |
+| `module_type` | `ModuleType` | Classification: `STDLIB`, `THIRD_PARTY`, `LOCAL`, `BUILTIN`, `FROZEN`, `NOT_FOUND` |
+| `is_package` | `bool` | Whether the module is a package (has `__init__.py`) |
+| `is_cached` | `bool` | Whether the module was already in `sys.modules` |
+| `submodule_of` | `str \| None` | Parent module name for dotted imports (e.g., `"os"` for `"os.path"`) |
+| `search_log` | `list[PathSearchEntry]` | sys.path entries that were checked |
+| `shadows` | `list[ShadowWarning]` | Detected import shadows |
+
+### Methods
+
+#### `to_dict() -> dict`
+
+Returns a JSON-serializable dictionary of the full trace.
+
+---
+
+## `PathSearchEntry`
+
+Frozen dataclass for one entry in the sys.path search log.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `path` | `str` | The sys.path entry that was checked |
+| `result` | `SearchResult` | `FOUND`, `NOT_FOUND`, or `SKIPPED` |
+| `candidate` | `str \| None` | File path found (if result is `FOUND`) |
+
+---
+
+## `ShadowWarning`
+
+Frozen dataclass for a detected import shadow.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `shadow_path` | `str` | Path of the file causing the shadow |
+| `shadowed_module` | `str` | Name of the module being shadowed |
+| `description` | `str` | Human-readable description of the shadow |

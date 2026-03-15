@@ -46,11 +46,50 @@ python -m pywho
 pywho --json --packages
 ```
 
+## Import tracing
+
+### Trace where an import resolves
+
+```bash
+pywho trace requests
+```
+
+Shows:
+
+- The resolved file path
+- Module type (stdlib, third-party, local, builtin)
+- Whether it's cached in `sys.modules`
+- The sys.path search order
+- Shadow warnings (if a local file shadows a real module)
+
+### Full search log
+
+```bash
+pywho trace json --verbose
+```
+
+Shows every sys.path entry that was checked, not just the abbreviated version.
+
+### JSON trace output
+
+```bash
+pywho trace requests --json
+```
+
+### Shadow detection
+
+If a local file shadows a stdlib or installed package, you'll see:
+
+```
+WARNING: './requests.py' shadows installed package 'requests'
+```
+
 ## Exit codes
 
 | Code | Meaning |
 |------|---------|
-| `0`  | Success |
+| `0`  | Success (no shadows for `trace`) |
+| `1`  | Shadows detected (for `trace`) |
 
 ## Python library
 
@@ -99,4 +138,25 @@ pywho --json > env-b.json
 
 # Diff
 diff env-a.json env-b.json
+```
+
+### Debug a mysterious ImportError
+
+```bash
+pywho trace requests
+# Shows exactly which file Python is loading and if it's shadowed
+```
+
+### Trace imports in Python code
+
+```python
+from pywho import trace_import
+
+trace = trace_import("requests")
+print(trace.resolved_path)
+print(trace.module_type)
+
+if trace.shadows:
+    for s in trace.shadows:
+        print(f"WARNING: {s.description}")
 ```
