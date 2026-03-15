@@ -114,10 +114,15 @@ class TestVenvDetection:
             assert venv.is_active is True
 
     def test_no_venv_when_prefix_equals_base(self) -> None:
-        env_clean = {k: v for k, v in os.environ.items()
-                     if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
-        with patch.dict(os.environ, env_clean, clear=True), \
-             patch.object(sys, "prefix", sys.base_prefix):
+        env_clean = {
+            k: v
+            for k, v in os.environ.items()
+            if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")
+        }
+        with (
+            patch.dict(os.environ, env_clean, clear=True),
+            patch.object(sys, "prefix", sys.base_prefix),
+        ):
             venv = _detect_venv()
             assert venv.is_active is False
             assert venv.type == "none"
@@ -134,11 +139,16 @@ class TestVenvDetection:
         (win_lib / "orig-prefix.txt").write_text("/usr")
         (tmp_path / "fakevenv" / "pyvenv.cfg").write_text("home = /usr/bin\n")
 
-        env_clean = {k: v for k, v in os.environ.items()
-                     if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
-        with patch.dict(os.environ, env_clean, clear=True), \
-             patch.object(sys, "prefix", fake_prefix), \
-             patch.object(sys, "base_prefix", "/usr"):
+        env_clean = {
+            k: v
+            for k, v in os.environ.items()
+            if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")
+        }
+        with (
+            patch.dict(os.environ, env_clean, clear=True),
+            patch.object(sys, "prefix", fake_prefix),
+            patch.object(sys, "base_prefix", "/usr"),
+        ):
             venv = _detect_venv()
             assert venv.type == "virtualenv"
             assert venv.is_active is True
@@ -149,11 +159,16 @@ class TestVenvDetection:
         cfg_text = "home = /usr/bin\nuv = 0.1.0\nprompt = myproject\n"
         (tmp_path / "uvvenv" / "pyvenv.cfg").write_text(cfg_text)
 
-        env_clean = {k: v for k, v in os.environ.items()
-                     if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
-        with patch.dict(os.environ, env_clean, clear=True), \
-             patch.object(sys, "prefix", fake_prefix), \
-             patch.object(sys, "base_prefix", "/usr"):
+        env_clean = {
+            k: v
+            for k, v in os.environ.items()
+            if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")
+        }
+        with (
+            patch.dict(os.environ, env_clean, clear=True),
+            patch.object(sys, "prefix", fake_prefix),
+            patch.object(sys, "base_prefix", "/usr"),
+        ):
             venv = _detect_venv()
             assert venv.type == "uv"
             assert venv.prompt == "myproject"
@@ -164,11 +179,16 @@ class TestVenvDetection:
         cfg_text = "home = /usr/bin\nuv = 0.1.0\nprompt = \n"
         (tmp_path / "uvvenv2" / "pyvenv.cfg").write_text(cfg_text)
 
-        env_clean = {k: v for k, v in os.environ.items()
-                     if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
-        with patch.dict(os.environ, env_clean, clear=True), \
-             patch.object(sys, "prefix", fake_prefix), \
-             patch.object(sys, "base_prefix", "/usr"):
+        env_clean = {
+            k: v
+            for k, v in os.environ.items()
+            if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")
+        }
+        with (
+            patch.dict(os.environ, env_clean, clear=True),
+            patch.object(sys, "prefix", fake_prefix),
+            patch.object(sys, "base_prefix", "/usr"),
+        ):
             venv = _detect_venv()
             assert venv.type == "uv"
             assert venv.prompt == "uvvenv2"
@@ -179,12 +199,17 @@ class TestVenvDetection:
         win_lib.mkdir(parents=True)
         (win_lib / "orig-prefix.txt").write_text("C:\\Python312")
 
-        env_clean = {k: v for k, v in os.environ.items()
-                     if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
-        with patch.dict(os.environ, env_clean, clear=True), \
-             patch.object(sys, "prefix", fake_prefix), \
-             patch.object(sys, "base_prefix", "C:\\Python312"), \
-             patch.object(sys, "platform", "win32"):
+        env_clean = {
+            k: v
+            for k, v in os.environ.items()
+            if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")
+        }
+        with (
+            patch.dict(os.environ, env_clean, clear=True),
+            patch.object(sys, "prefix", fake_prefix),
+            patch.object(sys, "base_prefix", "C:\\Python312"),
+            patch.object(sys, "platform", "win32"),
+        ):
             venv = _detect_venv()
             assert venv.type == "virtualenv"
 
@@ -192,9 +217,11 @@ class TestVenvDetection:
         fake_prefix = str(tmp_path / "poetryvenv")
         (tmp_path / "poetryvenv").mkdir()
 
-        with patch.dict(os.environ, {"POETRY_ACTIVE": "1"}, clear=False), \
-             patch.object(sys, "prefix", fake_prefix), \
-             patch.object(sys, "base_prefix", "/usr"):
+        with (
+            patch.dict(os.environ, {"POETRY_ACTIVE": "1"}, clear=False),
+            patch.object(sys, "prefix", fake_prefix),
+            patch.object(sys, "base_prefix", "/usr"),
+        ):
             venv = _detect_venv()
             assert venv.type == "poetry"
 
@@ -204,12 +231,17 @@ class TestVenvDetection:
         cfg = tmp_path / "badvenv" / "pyvenv.cfg"
         cfg.write_text("home = /usr\n")
 
-        env_clean = {k: v for k, v in os.environ.items()
-                     if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
-        with patch.dict(os.environ, env_clean, clear=True), \
-             patch.object(sys, "prefix", fake_prefix), \
-             patch.object(sys, "base_prefix", "/usr"), \
-             patch.object(Path, "read_text", side_effect=OSError("permission denied")):
+        env_clean = {
+            k: v
+            for k, v in os.environ.items()
+            if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")
+        }
+        with (
+            patch.dict(os.environ, env_clean, clear=True),
+            patch.object(sys, "prefix", fake_prefix),
+            patch.object(sys, "base_prefix", "/usr"),
+            patch.object(Path, "read_text", side_effect=OSError("permission denied")),
+        ):
             venv = _detect_venv()
             assert venv.is_active is True
 
@@ -224,11 +256,16 @@ class TestVenvDetection:
         unix_lib.mkdir(parents=True)
         (unix_lib / "orig-prefix.txt").write_text("C:\\Python312")
 
-        env_clean = {k: v for k, v in os.environ.items()
-                     if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
-        with patch.dict(os.environ, env_clean, clear=True), \
-             patch.object(sys, "prefix", fake_prefix), \
-             patch.object(sys, "base_prefix", "C:\\Python312"):
+        env_clean = {
+            k: v
+            for k, v in os.environ.items()
+            if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")
+        }
+        with (
+            patch.dict(os.environ, env_clean, clear=True),
+            patch.object(sys, "prefix", fake_prefix),
+            patch.object(sys, "base_prefix", "C:\\Python312"),
+        ):
             venv = _detect_venv()
             assert venv.type == "virtualenv"
 
@@ -270,18 +307,24 @@ class TestPackageManager:
             assert _detect_package_manager() == "pipenv"
 
     def test_poetry_manager(self) -> None:
-        env = {k: v for k, v in os.environ.items()
-               if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE")}
+        env = {
+            k: v for k, v in os.environ.items() if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE")
+        }
         env["POETRY_ACTIVE"] = "1"
         with patch.dict(os.environ, env, clear=True):
             assert _detect_package_manager() == "poetry"
 
     def test_pyenv_manager(self) -> None:
-        env = {k: v for k, v in os.environ.items()
-               if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
-        with patch.dict(os.environ, env, clear=True), \
-             patch.object(sys, "executable", "/home/user/.pyenv/shims/python"), \
-             patch("pywho.inspector.Path") as mock_path:
+        env = {
+            k: v
+            for k, v in os.environ.items()
+            if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")
+        }
+        with (
+            patch.dict(os.environ, env, clear=True),
+            patch.object(sys, "executable", "/home/user/.pyenv/shims/python"),
+            patch("pywho.inspector.Path") as mock_path,
+        ):
             cfg = MagicMock()
             cfg.exists.return_value = False
             mock_path.return_value.__truediv__ = lambda self, other: cfg
@@ -290,31 +333,43 @@ class TestPackageManager:
     def test_uv_manager(self, tmp_path: Path) -> None:
         cfg = tmp_path / "pyvenv.cfg"
         cfg.write_text("uv = 0.5.0\n")
-        env = {k: v for k, v in os.environ.items()
-               if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
-        with patch.dict(os.environ, env, clear=True), \
-             patch.object(sys, "prefix", str(tmp_path)):
+        env = {
+            k: v
+            for k, v in os.environ.items()
+            if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")
+        }
+        with patch.dict(os.environ, env, clear=True), patch.object(sys, "prefix", str(tmp_path)):
             assert _detect_package_manager() == "uv"
 
     def test_cfg_exists_but_no_uv(self, tmp_path: Path) -> None:
         cfg = tmp_path / "pyvenv.cfg"
         cfg.write_text("home = /usr/bin\n")
-        env = {k: v for k, v in os.environ.items()
-               if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
-        with patch.dict(os.environ, env, clear=True), \
-             patch.object(sys, "prefix", str(tmp_path)), \
-             patch.object(sys, "executable", "/usr/bin/python"):
+        env = {
+            k: v
+            for k, v in os.environ.items()
+            if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")
+        }
+        with (
+            patch.dict(os.environ, env, clear=True),
+            patch.object(sys, "prefix", str(tmp_path)),
+            patch.object(sys, "executable", "/usr/bin/python"),
+        ):
             assert _detect_package_manager() == "pip"
 
     def test_uv_manager_cfg_read_error(self, tmp_path: Path) -> None:
         cfg = tmp_path / "pyvenv.cfg"
         cfg.write_text("uv = 0.5\n")
-        env = {k: v for k, v in os.environ.items()
-               if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")}
-        with patch.dict(os.environ, env, clear=True), \
-             patch.object(sys, "prefix", str(tmp_path)), \
-             patch.object(sys, "executable", "/usr/bin/python"), \
-             patch.object(Path, "read_text", side_effect=OSError("permission denied")):
+        env = {
+            k: v
+            for k, v in os.environ.items()
+            if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")
+        }
+        with (
+            patch.dict(os.environ, env, clear=True),
+            patch.object(sys, "prefix", str(tmp_path)),
+            patch.object(sys, "executable", "/usr/bin/python"),
+            patch.object(Path, "read_text", side_effect=OSError("permission denied")),
+        ):
             assert _detect_package_manager() == "pip"
 
 
@@ -390,6 +445,7 @@ class TestToDict:
 
     def test_to_dict_json_serializable(self) -> None:
         import json
+
         report = inspect_environment(include_packages=True)
         d = report.to_dict()
         json_str = json.dumps(d)

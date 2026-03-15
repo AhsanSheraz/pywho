@@ -39,39 +39,150 @@ def _get_stdlib_names() -> set[str]:
         return set(sys.stdlib_module_names)
     # Fallback for 3.9
     return {
-        "abc", "argparse", "ast", "asyncio", "base64", "bisect", "builtins",
-        "calendar", "cmath", "cmd", "code", "codecs", "collections",
-        "configparser", "contextlib", "copy", "csv", "ctypes", "dataclasses",
-        "datetime", "decimal", "difflib", "dis", "email", "enum", "errno",
-        "fnmatch", "fractions", "ftplib", "functools", "gc", "getpass",
-        "glob", "gzip", "hashlib", "heapq", "hmac", "html", "http",
-        "importlib", "inspect", "io", "itertools", "json", "keyword",
-        "linecache", "locale", "logging", "lzma", "math", "mimetypes",
-        "multiprocessing", "numbers", "operator", "os", "pathlib", "pdb",
-        "pickle", "platform", "pprint", "profile", "pstats", "queue",
-        "random", "re", "readline", "reprlib", "resource", "sched",
-        "secrets", "select", "shelve", "shlex", "shutil", "signal",
-        "site", "smtplib", "socket", "socketserver", "sqlite3", "ssl",
-        "stat", "statistics", "string", "struct", "subprocess", "sys",
-        "sysconfig", "tarfile", "tempfile", "textwrap", "threading",
-        "time", "timeit", "token", "tokenize", "traceback", "types",
-        "typing", "unicodedata", "unittest", "urllib", "uuid", "venv",
-        "warnings", "weakref", "webbrowser", "xml", "xmlrpc", "zipfile",
-        "zipimport", "zlib",
+        "abc",
+        "argparse",
+        "ast",
+        "asyncio",
+        "base64",
+        "bisect",
+        "builtins",
+        "calendar",
+        "cmath",
+        "cmd",
+        "code",
+        "codecs",
+        "collections",
+        "configparser",
+        "contextlib",
+        "copy",
+        "csv",
+        "ctypes",
+        "dataclasses",
+        "datetime",
+        "decimal",
+        "difflib",
+        "dis",
+        "email",
+        "enum",
+        "errno",
+        "fnmatch",
+        "fractions",
+        "ftplib",
+        "functools",
+        "gc",
+        "getpass",
+        "glob",
+        "gzip",
+        "hashlib",
+        "heapq",
+        "hmac",
+        "html",
+        "http",
+        "importlib",
+        "inspect",
+        "io",
+        "itertools",
+        "json",
+        "keyword",
+        "linecache",
+        "locale",
+        "logging",
+        "lzma",
+        "math",
+        "mimetypes",
+        "multiprocessing",
+        "numbers",
+        "operator",
+        "os",
+        "pathlib",
+        "pdb",
+        "pickle",
+        "platform",
+        "pprint",
+        "profile",
+        "pstats",
+        "queue",
+        "random",
+        "re",
+        "readline",
+        "reprlib",
+        "resource",
+        "sched",
+        "secrets",
+        "select",
+        "shelve",
+        "shlex",
+        "shutil",
+        "signal",
+        "site",
+        "smtplib",
+        "socket",
+        "socketserver",
+        "sqlite3",
+        "ssl",
+        "stat",
+        "statistics",
+        "string",
+        "struct",
+        "subprocess",
+        "sys",
+        "sysconfig",
+        "tarfile",
+        "tempfile",
+        "textwrap",
+        "threading",
+        "time",
+        "timeit",
+        "token",
+        "tokenize",
+        "traceback",
+        "types",
+        "typing",
+        "unicodedata",
+        "unittest",
+        "urllib",
+        "uuid",
+        "venv",
+        "warnings",
+        "weakref",
+        "webbrowser",
+        "xml",
+        "xmlrpc",
+        "zipfile",
+        "zipimport",
+        "zlib",
     }
 
 
 # Files that are common project files, not intended as importable modules
 _IGNORE_NAMES: set[str] = {
-    "setup", "conftest", "manage", "__init__", "__main__",
+    "setup",
+    "conftest",
+    "manage",
+    "__init__",
+    "__main__",
 }
 
 # Directories to skip during scanning
 _EXCLUDE_DIRS: set[str] = {
-    ".git", ".hg", ".svn", "__pycache__", ".tox", ".nox",
-    ".mypy_cache", ".pytest_cache", "node_modules", ".venv",
-    "venv", "env", ".env", "site-packages", ".eggs", "dist",
-    "build", ".ruff_cache",
+    ".git",
+    ".hg",
+    ".svn",
+    "__pycache__",
+    ".tox",
+    ".nox",
+    ".mypy_cache",
+    ".pytest_cache",
+    "node_modules",
+    ".venv",
+    "venv",
+    "env",
+    ".env",
+    "site-packages",
+    ".eggs",
+    "dist",
+    "build",
+    ".ruff_cache",
 }
 
 
@@ -96,10 +207,7 @@ def _walk_python_files(root: Path, exclude_dirs: set[str]) -> list[Path]:
     """Walk directory tree yielding .py files, respecting exclusions."""
     files: list[Path] = []
     for dirpath, dirnames, filenames in os.walk(root):
-        dirnames[:] = [
-            d for d in dirnames
-            if d not in exclude_dirs and not d.endswith(".egg-info")
-        ]
+        dirnames[:] = [d for d in dirnames if d not in exclude_dirs and not d.endswith(".egg-info")]
         for fname in filenames:
             if fname.endswith(".py"):
                 files.append(Path(dirpath) / fname)
@@ -151,19 +259,23 @@ def scan_path(
             continue
 
         if module_name in stdlib:
-            results.append(ShadowResult(
-                path=filepath,
-                module_name=module_name,
-                shadows="stdlib",
-                severity=Severity.HIGH,
-            ))
+            results.append(
+                ShadowResult(
+                    path=filepath,
+                    module_name=module_name,
+                    shadows="stdlib",
+                    severity=Severity.HIGH,
+                )
+            )
         elif check_installed and _is_installed_package(module_name):
-            results.append(ShadowResult(
-                path=filepath,
-                module_name=module_name,
-                shadows=f"installed:{module_name}",
-                severity=Severity.MEDIUM,
-            ))
+            results.append(
+                ShadowResult(
+                    path=filepath,
+                    module_name=module_name,
+                    shadows=f"installed:{module_name}",
+                    severity=Severity.MEDIUM,
+                )
+            )
 
     results.sort(key=lambda r: (r.severity.value, r.module_name))
     return results

@@ -8,9 +8,7 @@ from pywho.scan_formatter import format_scan
 from pywho.scanner import Severity, ShadowResult
 
 
-def _shadow(
-    path: str, name: str, shadows: str, severity: Severity
-) -> ShadowResult:
+def _shadow(path: str, name: str, shadows: str, severity: Severity) -> ShadowResult:
     return ShadowResult(
         path=Path(path),
         module_name=name,
