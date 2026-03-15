@@ -131,18 +131,19 @@ def _classify_module(
     if spec.origin == "frozen":
         return ModuleType.FROZEN
 
+    origin = spec.origin or ""
+
+    # Check site-packages FIRST — on some platforms (macOS system Python),
+    # site-packages lives under the same prefix as stdlib
+    if "site-packages" in origin or "dist-packages" in origin:
+        return ModuleType.THIRD_PARTY
+
     if name in _get_stdlib_names() or name in sys.builtin_module_names:
         return ModuleType.STDLIB
 
-    origin = spec.origin or ""
     stdlib_path = os.path.dirname(os.__file__)
     if origin.startswith(stdlib_path):
         return ModuleType.STDLIB
-
-    # Check if it's in a site-packages directory
-    for path_entry in sys.path:
-        if "site-packages" in path_entry and origin.startswith(path_entry):
-            return ModuleType.THIRD_PARTY
 
     return ModuleType.LOCAL
 
