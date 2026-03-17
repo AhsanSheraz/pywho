@@ -42,7 +42,7 @@ pywho = "pywho.cli:main"
 Homepage = "https://github.com/AhsanSheraz/pywho"
 Repository = "https://github.com/AhsanSheraz/pywho"
 Issues = "https://github.com/AhsanSheraz/pywho/issues"
-Documentation = "https://ahsansheraz.github.io/pywho/"
+Documentation = "https://pywho.readthedocs.io/"
 Changelog = "https://github.com/AhsanSheraz/pywho/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.wheel]
