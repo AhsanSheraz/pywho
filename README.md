@@ -10,11 +10,14 @@
   <a href="https://github.com/AhsanSheraz/pywho/blob/main/LICENSE"><img src="https://img.shields.io/pypi/l/pywho.svg" alt="License"></a>
   <a href="https://pypi.org/project/pywho/"><img src="https://img.shields.io/pypi/dm/pywho.svg" alt="Downloads"></a>
   <a href="https://codecov.io/gh/AhsanSheraz/pywho"><img src="https://codecov.io/gh/AhsanSheraz/pywho/branch/main/graph/badge.svg" alt="Coverage"></a>
+  <a href="https://pywho.readthedocs.io/"><img src="https://readthedocs.org/projects/pywho/badge/?version=latest" alt="Documentation"></a>
 </p>
 
 ---
 
 Ever asked *"Which Python am I running? Why did `import X` load that file? Do I have any files shadowing real modules?"* — **pywho** answers all of it instantly.
+
+📖 **[Read the full documentation](https://pywho.readthedocs.io/)**
 
 ## Quick Reference
 
