@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.3.3] - 2026-03-22
+
+### Changed
+
+- Replaced `uvx pywho` recommendation with caveat about ephemeral environments
+- Re-release to include updated README on PyPI
+
+## [0.3.2] - 2026-03-22
+
+### Fixed
+
+- Respect `NO_COLOR` / `FORCE_COLOR` environment variables (https://no-color.org/)
+- Cache `supports_color()` with `lru_cache` to avoid redundant syscalls
+- Replace private `dist._path` with public `dist.locate_file()` API
+- Narrow bare `except Exception` to `(ImportError, StopIteration, OSError)`
+- Complete Python 3.9 stdlib fallback (100 to 205 modules)
+- Eliminate redundant `pyvenv.cfg` read in `_detect_package_manager()`
+- Add explicit `encoding="utf-8"` for `pyvenv.cfg` reads
+- Add `if __name__ == "__main__"` guard to `__main__.py`
+
+### Changed
+
+- Extract duplicated `_get_stdlib_names()` to shared `_stdlib.py` module
+- Use `frozenset` for `_EXCLUDE_DIRS` and `_IGNORE_NAMES` constants
+- Upgrade classifier to `Development Status :: 5 - Production/Stable`
+
 ## [0.3.1] - 2026-03-15
 
 ### Added
