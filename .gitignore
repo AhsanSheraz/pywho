@@ -188,6 +188,10 @@ cython_debug/
 #  you could uncomment the following to ignore the entire vscode folder
 # .vscode/
 
+# Claude Code
+.claude/
+CLAUDE.md
+
 # Ruff stuff:
 .ruff_cache/
 
