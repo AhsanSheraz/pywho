@@ -4,10 +4,11 @@ from __future__ import annotations
 
 import importlib.util
 import os
-import sys
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
+
+from pywho._stdlib import get_stdlib_names
 
 
 class Severity(Enum):
@@ -33,157 +34,40 @@ class ShadowResult:
         return f"shadows installed package '{self.module_name}'"
 
 
-def _get_stdlib_names() -> set[str]:
-    """Return stdlib module names."""
-    if hasattr(sys, "stdlib_module_names"):
-        return set(sys.stdlib_module_names)
-    # Fallback for 3.9
-    return {
-        "abc",
-        "argparse",
-        "ast",
-        "asyncio",
-        "base64",
-        "bisect",
-        "builtins",
-        "calendar",
-        "cmath",
-        "cmd",
-        "code",
-        "codecs",
-        "collections",
-        "configparser",
-        "contextlib",
-        "copy",
-        "csv",
-        "ctypes",
-        "dataclasses",
-        "datetime",
-        "decimal",
-        "difflib",
-        "dis",
-        "email",
-        "enum",
-        "errno",
-        "fnmatch",
-        "fractions",
-        "ftplib",
-        "functools",
-        "gc",
-        "getpass",
-        "glob",
-        "gzip",
-        "hashlib",
-        "heapq",
-        "hmac",
-        "html",
-        "http",
-        "importlib",
-        "inspect",
-        "io",
-        "itertools",
-        "json",
-        "keyword",
-        "linecache",
-        "locale",
-        "logging",
-        "lzma",
-        "math",
-        "mimetypes",
-        "multiprocessing",
-        "numbers",
-        "operator",
-        "os",
-        "pathlib",
-        "pdb",
-        "pickle",
-        "platform",
-        "pprint",
-        "profile",
-        "pstats",
-        "queue",
-        "random",
-        "re",
-        "readline",
-        "reprlib",
-        "resource",
-        "sched",
-        "secrets",
-        "select",
-        "shelve",
-        "shlex",
-        "shutil",
-        "signal",
-        "site",
-        "smtplib",
-        "socket",
-        "socketserver",
-        "sqlite3",
-        "ssl",
-        "stat",
-        "statistics",
-        "string",
-        "struct",
-        "subprocess",
-        "sys",
-        "sysconfig",
-        "tarfile",
-        "tempfile",
-        "textwrap",
-        "threading",
-        "time",
-        "timeit",
-        "token",
-        "tokenize",
-        "traceback",
-        "types",
-        "typing",
-        "unicodedata",
-        "unittest",
-        "urllib",
-        "uuid",
-        "venv",
-        "warnings",
-        "weakref",
-        "webbrowser",
-        "xml",
-        "xmlrpc",
-        "zipfile",
-        "zipimport",
-        "zlib",
-    }
-
-
 # Files that are common project files, not intended as importable modules
-_IGNORE_NAMES: set[str] = {
-    "setup",
-    "conftest",
-    "manage",
-    "__init__",
-    "__main__",
-}
+_IGNORE_NAMES: frozenset[str] = frozenset(
+    {
+        "setup",
+        "conftest",
+        "manage",
+        "__init__",
+        "__main__",
+    }
+)
 
 # Directories to skip during scanning
-_EXCLUDE_DIRS: set[str] = {
-    ".git",
-    ".hg",
-    ".svn",
-    "__pycache__",
-    ".tox",
-    ".nox",
-    ".mypy_cache",
-    ".pytest_cache",
-    "node_modules",
-    ".venv",
-    "venv",
-    "env",
-    ".env",
-    "site-packages",
-    ".eggs",
-    "dist",
-    "build",
-    ".ruff_cache",
-}
+_EXCLUDE_DIRS: frozenset[str] = frozenset(
+    {
+        ".git",
+        ".hg",
+        ".svn",
+        "__pycache__",
+        ".tox",
+        ".nox",
+        ".mypy_cache",
+        ".pytest_cache",
+        "node_modules",
+        ".venv",
+        "venv",
+        "env",
+        ".env",
+        "site-packages",
+        ".eggs",
+        "dist",
+        "build",
+        ".ruff_cache",
+    }
+)
 
 
 def _is_installed_package(name: str) -> bool:
@@ -203,7 +87,7 @@ def _is_installed_package(name: str) -> bool:
         return False
 
 
-def _walk_python_files(root: Path, exclude_dirs: set[str]) -> list[Path]:
+def _walk_python_files(root: Path, exclude_dirs: frozenset[str]) -> list[Path]:
     """Walk directory tree yielding .py files, respecting exclusions."""
     files: list[Path] = []
     for dirpath, dirnames, filenames in os.walk(root):
@@ -218,8 +102,8 @@ def scan_path(
     root: Path,
     *,
     check_installed: bool = True,
-    exclude_dirs: set[str] | None = None,
-    ignore_names: set[str] | None = None,
+    exclude_dirs: frozenset[str] | None = None,
+    ignore_names: frozenset[str] | None = None,
 ) -> list[ShadowResult]:
     """
     Scan a directory tree for Python files that shadow stdlib or installed packages.
@@ -238,7 +122,7 @@ def scan_path(
     if ignore_names is None:
         ignore_names = _IGNORE_NAMES
 
-    stdlib = _get_stdlib_names()
+    stdlib = get_stdlib_names()
     results: list[ShadowResult] = []
 
     if root.is_file():

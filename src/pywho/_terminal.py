@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import functools
 import os
 import sys
 
@@ -18,8 +19,17 @@ RED = "\033[91m"
 WHITE = "\033[37m"
 
 
+@functools.lru_cache(maxsize=1)
 def supports_color() -> bool:
-    """Check if stdout supports ANSI colors."""
+    """Check if stdout supports ANSI colors.
+
+    Respects ``NO_COLOR`` (https://no-color.org/) and ``FORCE_COLOR``
+    environment variables.
+    """
+    if os.environ.get("NO_COLOR") is not None:
+        return False
+    if os.environ.get("FORCE_COLOR") is not None:
+        return True
     if hasattr(sys.stdout, "isatty") and sys.stdout.isatty():
         return True
     if "ANSICON" in os.environ:

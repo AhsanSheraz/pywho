@@ -156,7 +156,7 @@ def _detect_venv() -> VenvInfo:
     pyvenv_cfg = Path(venv_path) / "pyvenv.cfg"
     if pyvenv_cfg.exists():
         try:
-            cfg_text = pyvenv_cfg.read_text()
+            cfg_text = pyvenv_cfg.read_text(encoding="utf-8")
             if "uv = " in cfg_text or "uv=" in cfg_text:
                 venv_type = "uv"
             # Read prompt from pyvenv.cfg if available
@@ -194,24 +194,19 @@ def _get_site_packages() -> list[str]:
     return dirs
 
 
-def _detect_package_manager() -> str:
-    """Best-effort guess at the tool managing this environment."""
+def _detect_package_manager(venv_type: str) -> str:
+    """Best-effort guess at the tool managing this environment.
+
+    Reuses the already-detected *venv_type* to avoid re-reading pyvenv.cfg.
+    """
     if os.environ.get("CONDA_DEFAULT_ENV"):
         return "conda"
     if os.environ.get("PIPENV_ACTIVE") == "1":
         return "pipenv"
     if os.environ.get("POETRY_ACTIVE") == "1":
         return "poetry"
-
-    # Check pyvenv.cfg for uv
-    pyvenv_cfg = Path(sys.prefix) / "pyvenv.cfg"
-    if pyvenv_cfg.exists():
-        try:
-            cfg_text = pyvenv_cfg.read_text()
-            if "uv = " in cfg_text or "uv=" in cfg_text:
-                return "uv"
-        except OSError:
-            pass
+    if venv_type == "uv":
+        return "uv"
 
     # Check if pyenv is managing the interpreter
     if "pyenv" in sys.executable:
@@ -252,12 +247,15 @@ def _get_installed_packages() -> list[PackageInfo]:
                 continue
             seen.add(name)
             version = dist.metadata["Version"] or "unknown"
-            location = str(dist._path.parent) if hasattr(dist, "_path") else "unknown"
+            if hasattr(dist, "locate_file"):
+                location = str(dist.locate_file("").parent)
+            else:
+                location = "unknown"
             packages.append(PackageInfo(name=name, version=version, location=location))
 
         packages.sort(key=lambda p: p.name.lower())
         return packages
-    except Exception:
+    except (ImportError, StopIteration, OSError):
         return []
 
 
@@ -296,7 +294,7 @@ def inspect_environment(*, include_packages: bool = True) -> EnvironmentReport:
         exec_prefix=sys.exec_prefix,
         sys_path=sys.path.copy(),
         site_packages=_get_site_packages(),
-        package_manager=_detect_package_manager(),
+        package_manager=_detect_package_manager(venv.type),
         pip_version=_get_pip_version(),
         packages=_get_installed_packages() if include_packages else [],
     )

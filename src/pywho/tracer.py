@@ -9,6 +9,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 
+from pywho._stdlib import get_stdlib_names
+
 
 class ModuleType(Enum):
     """Classification of a resolved module."""
@@ -88,127 +90,6 @@ class TraceReport:
         }
 
 
-def _get_stdlib_names() -> set[str]:
-    """Return stdlib module names."""
-    if hasattr(sys, "stdlib_module_names"):
-        return set(sys.stdlib_module_names)
-    # Fallback for 3.9
-    return {
-        "abc",
-        "argparse",
-        "ast",
-        "asyncio",
-        "base64",
-        "bisect",
-        "builtins",
-        "calendar",
-        "cmath",
-        "cmd",
-        "code",
-        "codecs",
-        "collections",
-        "configparser",
-        "contextlib",
-        "copy",
-        "csv",
-        "ctypes",
-        "dataclasses",
-        "datetime",
-        "decimal",
-        "difflib",
-        "dis",
-        "email",
-        "enum",
-        "errno",
-        "fnmatch",
-        "fractions",
-        "ftplib",
-        "functools",
-        "gc",
-        "getpass",
-        "glob",
-        "gzip",
-        "hashlib",
-        "heapq",
-        "hmac",
-        "html",
-        "http",
-        "importlib",
-        "inspect",
-        "io",
-        "itertools",
-        "json",
-        "keyword",
-        "linecache",
-        "locale",
-        "logging",
-        "lzma",
-        "math",
-        "mimetypes",
-        "multiprocessing",
-        "numbers",
-        "operator",
-        "os",
-        "pathlib",
-        "pdb",
-        "pickle",
-        "platform",
-        "pprint",
-        "profile",
-        "pstats",
-        "queue",
-        "random",
-        "re",
-        "readline",
-        "reprlib",
-        "resource",
-        "sched",
-        "secrets",
-        "select",
-        "shelve",
-        "shlex",
-        "shutil",
-        "signal",
-        "site",
-        "smtplib",
-        "socket",
-        "socketserver",
-        "sqlite3",
-        "ssl",
-        "stat",
-        "statistics",
-        "string",
-        "struct",
-        "subprocess",
-        "sys",
-        "sysconfig",
-        "tarfile",
-        "tempfile",
-        "textwrap",
-        "threading",
-        "time",
-        "timeit",
-        "token",
-        "tokenize",
-        "traceback",
-        "types",
-        "typing",
-        "unicodedata",
-        "unittest",
-        "urllib",
-        "uuid",
-        "venv",
-        "warnings",
-        "weakref",
-        "webbrowser",
-        "xml",
-        "xmlrpc",
-        "zipfile",
-        "zipimport",
-        "zlib",
-    }
-
-
 def _classify_module(
     name: str,
     spec: importlib.machinery.ModuleSpec | None,
@@ -230,7 +111,7 @@ def _classify_module(
     if "site-packages" in origin or "dist-packages" in origin:
         return ModuleType.THIRD_PARTY
 
-    if name in _get_stdlib_names() or name in sys.builtin_module_names:
+    if name in get_stdlib_names() or name in sys.builtin_module_names:
         return ModuleType.STDLIB
 
     stdlib_path = os.path.dirname(os.__file__)
@@ -315,7 +196,7 @@ def _detect_shadows(
     module_type: ModuleType,
 ) -> list[ShadowWarning]:
     """Detect if any earlier path entries shadow the resolved module."""
-    stdlib_names = _get_stdlib_names()
+    stdlib_names = get_stdlib_names()
     shadows: list[ShadowWarning] = []
 
     found_entries = [e for e in search_log if e.result == SearchResult.FOUND]

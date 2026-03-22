@@ -292,19 +292,19 @@ class TestPackageManager:
     """Test package manager detection."""
 
     def test_returns_string(self) -> None:
-        result = _detect_package_manager()
+        result = _detect_package_manager("none")
         assert isinstance(result, str)
         assert result in ("pip", "conda", "pipenv", "poetry", "uv", "pyenv")
 
     def test_conda_manager(self) -> None:
         with patch.dict(os.environ, {"CONDA_DEFAULT_ENV": "base"}):
-            assert _detect_package_manager() == "conda"
+            assert _detect_package_manager("none") == "conda"
 
     def test_pipenv_manager(self) -> None:
         env = {k: v for k, v in os.environ.items() if k != "CONDA_DEFAULT_ENV"}
         env["PIPENV_ACTIVE"] = "1"
         with patch.dict(os.environ, env, clear=True):
-            assert _detect_package_manager() == "pipenv"
+            assert _detect_package_manager("none") == "pipenv"
 
     def test_poetry_manager(self) -> None:
         env = {
@@ -312,7 +312,7 @@ class TestPackageManager:
         }
         env["POETRY_ACTIVE"] = "1"
         with patch.dict(os.environ, env, clear=True):
-            assert _detect_package_manager() == "poetry"
+            assert _detect_package_manager("none") == "poetry"
 
     def test_pyenv_manager(self) -> None:
         env = {
@@ -323,27 +323,19 @@ class TestPackageManager:
         with (
             patch.dict(os.environ, env, clear=True),
             patch.object(sys, "executable", "/home/user/.pyenv/shims/python"),
-            patch("pywho.inspector.Path") as mock_path,
         ):
-            cfg = MagicMock()
-            cfg.exists.return_value = False
-            mock_path.return_value.__truediv__ = lambda self, other: cfg
-            assert _detect_package_manager() == "pyenv"
+            assert _detect_package_manager("none") == "pyenv"
 
-    def test_uv_manager(self, tmp_path: Path) -> None:
-        cfg = tmp_path / "pyvenv.cfg"
-        cfg.write_text("uv = 0.5.0\n")
+    def test_uv_manager(self) -> None:
         env = {
             k: v
             for k, v in os.environ.items()
             if k not in ("CONDA_DEFAULT_ENV", "PIPENV_ACTIVE", "POETRY_ACTIVE")
         }
-        with patch.dict(os.environ, env, clear=True), patch.object(sys, "prefix", str(tmp_path)):
-            assert _detect_package_manager() == "uv"
+        with patch.dict(os.environ, env, clear=True):
+            assert _detect_package_manager("uv") == "uv"
 
-    def test_cfg_exists_but_no_uv(self, tmp_path: Path) -> None:
-        cfg = tmp_path / "pyvenv.cfg"
-        cfg.write_text("home = /usr/bin\n")
+    def test_cfg_exists_but_no_uv(self) -> None:
         env = {
             k: v
             for k, v in os.environ.items()
@@ -351,14 +343,11 @@ class TestPackageManager:
         }
         with (
             patch.dict(os.environ, env, clear=True),
-            patch.object(sys, "prefix", str(tmp_path)),
             patch.object(sys, "executable", "/usr/bin/python"),
         ):
-            assert _detect_package_manager() == "pip"
+            assert _detect_package_manager("venv") == "pip"
 
-    def test_uv_manager_cfg_read_error(self, tmp_path: Path) -> None:
-        cfg = tmp_path / "pyvenv.cfg"
-        cfg.write_text("uv = 0.5\n")
+    def test_uv_manager_from_venv_type(self) -> None:
         env = {
             k: v
             for k, v in os.environ.items()
@@ -366,11 +355,9 @@ class TestPackageManager:
         }
         with (
             patch.dict(os.environ, env, clear=True),
-            patch.object(sys, "prefix", str(tmp_path)),
             patch.object(sys, "executable", "/usr/bin/python"),
-            patch.object(Path, "read_text", side_effect=OSError("permission denied")),
         ):
-            assert _detect_package_manager() == "pip"
+            assert _detect_package_manager("uv") == "uv"
 
 
 class TestPipVersion:
@@ -418,7 +405,7 @@ class TestInstalledPackages:
             assert names == sorted(names)
 
     def test_handles_exception(self) -> None:
-        with patch("importlib.metadata.distributions", side_effect=Exception("boom")):
+        with patch("importlib.metadata.distributions", side_effect=OSError("boom")):
             assert _get_installed_packages() == []
 
 

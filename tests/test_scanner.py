@@ -6,10 +6,10 @@ import sys
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+from pywho._stdlib import get_stdlib_names
 from pywho.scanner import (
     Severity,
     ShadowResult,
-    _get_stdlib_names,
     _is_installed_package,
     scan_path,
 )
@@ -157,7 +157,7 @@ class TestStdlibNames:
         try:
             if hasattr(sys, "stdlib_module_names"):
                 delattr(sys, "stdlib_module_names")
-            names = _get_stdlib_names()
+            names = get_stdlib_names()
             assert "os" in names
             assert "json" in names
             assert "math" in names
@@ -202,7 +202,7 @@ class TestScanPathOptions:
         results = scan_path(
             tmp_path,
             check_installed=False,
-            exclude_dirs={"custom"},
+            exclude_dirs=frozenset({"custom"}),
         )
         assert len(results) == 0
 
@@ -211,7 +211,7 @@ class TestScanPathOptions:
         results = scan_path(
             tmp_path,
             check_installed=False,
-            ignore_names={"math"},
+            ignore_names=frozenset({"math"}),
         )
         assert len(results) == 0
 
