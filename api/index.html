@@ -1,0 +1,1559 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="One command to explain your Python environment.">
+      
+      
+        <meta name="author" content="Ahsan Sheraz">
+      
+      
+        <link rel="canonical" href="https://pywho.readthedocs.io/api/">
+      
+      
+        <link rel="prev" href="../usage/">
+      
+      
+        <link rel="next" href="../contributing/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>API Reference - pywho</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#api-reference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="pywho" class="md-header__button md-logo" aria-label="pywho" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            pywho
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              API Reference
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/AhsanSheraz/pywho" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AhsanSheraz/pywho
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="pywho" class="md-nav__button md-logo" aria-label="pywho" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    pywho
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/AhsanSheraz/pywho" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AhsanSheraz/pywho
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#inspect_environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        inspect_environment
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environmentreport" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EnvironmentReport
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EnvironmentReport">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interpreter-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interpreter fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#platform-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Platform fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#virtual-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Virtual environment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#path-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#package-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Package management
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#to_dict-dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_dict() -&gt; dict
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#venvinfo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VenvInfo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#packageinfo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PackageInfo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trace_import" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        trace_import
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tracereport" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TraceReport
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TraceReport">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#methods_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#to_dict-dict_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_dict() -&gt; dict
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pathsearchentry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PathSearchEntry
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shadowwarning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ShadowWarning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scan_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        scan_path
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shadowresult" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ShadowResult
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#severity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Severity
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#inspect_environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        inspect_environment
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environmentreport" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EnvironmentReport
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EnvironmentReport">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interpreter-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interpreter fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#platform-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Platform fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#virtual-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Virtual environment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#path-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#package-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Package management
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#to_dict-dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_dict() -&gt; dict
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#venvinfo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VenvInfo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#packageinfo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PackageInfo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trace_import" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        trace_import
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tracereport" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TraceReport
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TraceReport">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#methods_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#to_dict-dict_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_dict() -&gt; dict
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pathsearchentry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PathSearchEntry
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shadowwarning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ShadowWarning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scan_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        scan_path
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shadowresult" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ShadowResult
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#severity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Severity
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="api-reference">API Reference</h1>
+<h2 id="inspect_environment"><code>inspect_environment</code></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pywho</span><span class="w"> </span><span class="kn">import</span> <span class="n">inspect_environment</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">report</span> <span class="o">=</span> <span class="n">inspect_environment</span><span class="p">(</span><span class="n">include_packages</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>include_packages</code></td>
+<td><code>bool</code></td>
+<td><code>True</code></td>
+<td>Whether to list installed packages. Set to <code>False</code> for faster output.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>EnvironmentReport</code></p>
+<hr />
+<h2 id="environmentreport"><code>EnvironmentReport</code></h2>
+<p>Frozen dataclass containing the full environment snapshot.</p>
+<h3 id="interpreter-fields">Interpreter fields</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>executable</code></td>
+<td><code>str</code></td>
+<td>Path to the Python executable</td>
+</tr>
+<tr>
+<td><code>version</code></td>
+<td><code>str</code></td>
+<td>Python version string (e.g., <code>"3.12.3"</code>)</td>
+</tr>
+<tr>
+<td><code>version_info</code></td>
+<td><code>str</code></td>
+<td>Major.minor.micro version</td>
+</tr>
+<tr>
+<td><code>implementation</code></td>
+<td><code>str</code></td>
+<td>Python implementation (e.g., <code>"CPython"</code>)</td>
+</tr>
+<tr>
+<td><code>compiler</code></td>
+<td><code>str</code></td>
+<td>Compiler used to build Python</td>
+</tr>
+<tr>
+<td><code>architecture</code></td>
+<td><code>str</code></td>
+<td><code>"64-bit"</code> or <code>"32-bit"</code></td>
+</tr>
+<tr>
+<td><code>build_date</code></td>
+<td><code>str</code></td>
+<td>Build info string</td>
+</tr>
+</tbody>
+</table>
+<h3 id="platform-fields">Platform fields</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>platform_system</code></td>
+<td><code>str</code></td>
+<td>OS name (e.g., <code>"Darwin"</code>, <code>"Linux"</code>, <code>"Windows"</code>)</td>
+</tr>
+<tr>
+<td><code>platform_release</code></td>
+<td><code>str</code></td>
+<td>OS release version</td>
+</tr>
+<tr>
+<td><code>platform_machine</code></td>
+<td><code>str</code></td>
+<td>Machine architecture (e.g., <code>"arm64"</code>, <code>"x86_64"</code>)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="virtual-environment">Virtual environment</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>venv</code></td>
+<td><code>VenvInfo</code></td>
+<td>Virtual environment details</td>
+</tr>
+</tbody>
+</table>
+<h3 id="path-fields">Path fields</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>prefix</code></td>
+<td><code>str</code></td>
+<td><code>sys.prefix</code></td>
+</tr>
+<tr>
+<td><code>base_prefix</code></td>
+<td><code>str</code></td>
+<td><code>sys.base_prefix</code></td>
+</tr>
+<tr>
+<td><code>exec_prefix</code></td>
+<td><code>str</code></td>
+<td><code>sys.exec_prefix</code></td>
+</tr>
+<tr>
+<td><code>sys_path</code></td>
+<td><code>list[str]</code></td>
+<td>Copy of <code>sys.path</code></td>
+</tr>
+<tr>
+<td><code>site_packages</code></td>
+<td><code>list[str]</code></td>
+<td>Active site-packages directories</td>
+</tr>
+</tbody>
+</table>
+<h3 id="package-management">Package management</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>package_manager</code></td>
+<td><code>str</code></td>
+<td>Detected package manager</td>
+</tr>
+<tr>
+<td><code>pip_version</code></td>
+<td><code>str \| None</code></td>
+<td>pip version if available</td>
+</tr>
+<tr>
+<td><code>packages</code></td>
+<td><code>list[PackageInfo]</code></td>
+<td>Installed packages (if requested)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="methods">Methods</h3>
+<h4 id="to_dict-dict"><code>to_dict() -&gt; dict</code></h4>
+<p>Returns a JSON-serializable dictionary of the full report.</p>
+<hr />
+<h2 id="venvinfo"><code>VenvInfo</code></h2>
+<p>Frozen dataclass for virtual environment details.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>is_active</code></td>
+<td><code>bool</code></td>
+<td>Whether a venv is active</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td><code>str</code></td>
+<td>One of: <code>"venv"</code>, <code>"virtualenv"</code>, <code>"uv"</code>, <code>"conda"</code>, <code>"poetry"</code>, <code>"pipenv"</code>, <code>"none"</code></td>
+</tr>
+<tr>
+<td><code>path</code></td>
+<td><code>str \| None</code></td>
+<td>Path to the virtual environment</td>
+</tr>
+<tr>
+<td><code>prompt</code></td>
+<td><code>str \| None</code></td>
+<td>Venv prompt name</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="packageinfo"><code>PackageInfo</code></h2>
+<p>Frozen dataclass for an installed package.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td><code>str</code></td>
+<td>Package name</td>
+</tr>
+<tr>
+<td><code>version</code></td>
+<td><code>str</code></td>
+<td>Installed version</td>
+</tr>
+<tr>
+<td><code>location</code></td>
+<td><code>str</code></td>
+<td>Installation path</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="trace_import"><code>trace_import</code></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pywho</span><span class="w"> </span><span class="kn">import</span> <span class="n">trace_import</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">report</span> <span class="o">=</span> <span class="n">trace_import</span><span class="p">(</span><span class="s2">&quot;requests&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>module_name</code></td>
+<td><code>str</code></td>
+<td><em>(required)</em></td>
+<td>Module to trace (e.g., <code>"requests"</code>, <code>"os.path"</code>)</td>
+</tr>
+<tr>
+<td><code>verbose</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Include all sys.path entries in search log</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>TraceReport</code></p>
+<hr />
+<h2 id="tracereport"><code>TraceReport</code></h2>
+<p>Frozen dataclass containing the full import resolution trace.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>module_name</code></td>
+<td><code>str</code></td>
+<td>The module that was traced</td>
+</tr>
+<tr>
+<td><code>resolved_path</code></td>
+<td><code>str \| None</code></td>
+<td>File path the import resolves to (<code>None</code> if not found)</td>
+</tr>
+<tr>
+<td><code>module_type</code></td>
+<td><code>ModuleType</code></td>
+<td>Classification: <code>STDLIB</code>, <code>THIRD_PARTY</code>, <code>LOCAL</code>, <code>BUILTIN</code>, <code>FROZEN</code>, <code>NOT_FOUND</code></td>
+</tr>
+<tr>
+<td><code>is_package</code></td>
+<td><code>bool</code></td>
+<td>Whether the module is a package (has <code>__init__.py</code>)</td>
+</tr>
+<tr>
+<td><code>is_cached</code></td>
+<td><code>bool</code></td>
+<td>Whether the module was already in <code>sys.modules</code></td>
+</tr>
+<tr>
+<td><code>submodule_of</code></td>
+<td><code>str \| None</code></td>
+<td>Parent module name for dotted imports (e.g., <code>"os"</code> for <code>"os.path"</code>)</td>
+</tr>
+<tr>
+<td><code>search_log</code></td>
+<td><code>list[PathSearchEntry]</code></td>
+<td>sys.path entries that were checked</td>
+</tr>
+<tr>
+<td><code>shadows</code></td>
+<td><code>list[ShadowWarning]</code></td>
+<td>Detected import shadows</td>
+</tr>
+</tbody>
+</table>
+<h3 id="methods_1">Methods</h3>
+<h4 id="to_dict-dict_1"><code>to_dict() -&gt; dict</code></h4>
+<p>Returns a JSON-serializable dictionary of the full trace.</p>
+<hr />
+<h2 id="pathsearchentry"><code>PathSearchEntry</code></h2>
+<p>Frozen dataclass for one entry in the sys.path search log.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>path</code></td>
+<td><code>str</code></td>
+<td>The sys.path entry that was checked</td>
+</tr>
+<tr>
+<td><code>result</code></td>
+<td><code>SearchResult</code></td>
+<td><code>FOUND</code>, <code>NOT_FOUND</code>, or <code>SKIPPED</code></td>
+</tr>
+<tr>
+<td><code>candidate</code></td>
+<td><code>str \| None</code></td>
+<td>File path found (if result is <code>FOUND</code>)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="shadowwarning"><code>ShadowWarning</code></h2>
+<p>Frozen dataclass for a detected import shadow.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>shadow_path</code></td>
+<td><code>str</code></td>
+<td>Path of the file causing the shadow</td>
+</tr>
+<tr>
+<td><code>shadowed_module</code></td>
+<td><code>str</code></td>
+<td>Name of the module being shadowed</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td><code>str</code></td>
+<td>Human-readable description of the shadow</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="scan_path"><code>scan_path</code></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pywho</span><span class="w"> </span><span class="kn">import</span> <span class="n">scan_path</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">results</span> <span class="o">=</span> <span class="n">scan_path</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">),</span> <span class="n">check_installed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>root</code></td>
+<td><code>Path</code></td>
+<td><em>(required)</em></td>
+<td>Directory or file to scan</td>
+</tr>
+<tr>
+<td><code>check_installed</code></td>
+<td><code>bool</code></td>
+<td><code>True</code></td>
+<td>Also check against installed packages (not just stdlib)</td>
+</tr>
+<tr>
+<td><code>exclude_dirs</code></td>
+<td><code>set[str] \| None</code></td>
+<td><code>None</code></td>
+<td>Additional directory names to skip (merged with defaults)</td>
+</tr>
+<tr>
+<td><code>ignore_names</code></td>
+<td><code>set[str] \| None</code></td>
+<td><code>None</code></td>
+<td>Additional filenames to ignore (merged with defaults)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>list[ShadowResult]</code></p>
+<hr />
+<h2 id="shadowresult"><code>ShadowResult</code></h2>
+<p>Frozen dataclass for a detected shadow file.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>path</code></td>
+<td><code>Path</code></td>
+<td>Path to the shadowing file</td>
+</tr>
+<tr>
+<td><code>module_name</code></td>
+<td><code>str</code></td>
+<td>Name of the module being shadowed</td>
+</tr>
+<tr>
+<td><code>shadows</code></td>
+<td><code>str</code></td>
+<td>What it shadows: <code>"stdlib"</code> or <code>"installed:&lt;pkg&gt;"</code></td>
+</tr>
+<tr>
+<td><code>severity</code></td>
+<td><code>Severity</code></td>
+<td><code>HIGH</code> (stdlib) or <code>MEDIUM</code> (installed)</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td><code>str</code></td>
+<td>Human-readable description</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="severity"><code>Severity</code></h2>
+<p>Enum for shadow severity levels.</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Severity.HIGH</code></td>
+<td>Shadows a stdlib module</td>
+</tr>
+<tr>
+<td><code>Severity.MEDIUM</code></td>
+<td>Shadows an installed package</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.copy", "navigation.sections"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
