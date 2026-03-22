@@ -17,11 +17,16 @@ pip install pywho
 uv pip install pywho
 ```
 
-## Run without installing
+## Run as module
+
+If you prefer not to install, you can run pywho directly:
 
 ```bash
-uvx pywho
+python -m pywho
 ```
+
+!!! warning "Why not `uvx pywho`?"
+    `uvx` runs tools inside an ephemeral sandbox environment. This means `pywho` would report that temporary environment instead of your actual project environment. Always install pywho into the environment you want to inspect.
 
 ## From source
 

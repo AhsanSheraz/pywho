@@ -62,11 +62,7 @@ Or with [uv](https://docs.astral.sh/uv/):
 uv pip install pywho
 ```
 
-Or run without installing:
-
-```bash
-uvx pywho
-```
+> **Note:** `uvx pywho` is not recommended — it runs inside uv's ephemeral sandbox, so the output reflects that temporary environment instead of your actual project. Always install pywho into the environment you want to inspect.
 
 ## Why pywho?
 
