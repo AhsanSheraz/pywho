@@ -1,7 +1,7 @@
 # Runtime: no dependencies (stdlib only)
 
 # Dev
-pytest>=7.0
+pytest>=8.4.2
 mypy>=1.0
 ruff>=0.11.0
 pre-commit>=4.3.0
