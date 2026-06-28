@@ -2,6 +2,6 @@
 
 # Dev
 pytest>=8.4.2
-mypy>=1.19.1
+mypy>=2.1.0
 ruff>=0.15.17
 pre-commit>=4.3.0
