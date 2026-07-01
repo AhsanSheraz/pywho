@@ -1,0 +1,18 @@
+[project]
+site_name = "pywho"
+site_url = "https://pywho.readthedocs.io/"
+site_description = "One command to explain your Python environment."
+site_author = "Ahsan Sheraz"
+repo_url = "https://github.com/AhsanSheraz/pywho"
+repo_name = "AhsanSheraz/pywho"
+edit_uri = "edit/main/docs"
+docs_dir = "docs"
+site_dir = "site"
+nav = [
+  { "Home" = "index.md" },
+  { "Installation" = "installation.md" },
+  { "Usage" = "usage.md" },
+  { "API Reference" = "api.md" },
+  { "Contributing" = "contributing.md" },
+  { "Changelog" = "changelog.md" },
+]

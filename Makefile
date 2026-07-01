@@ -44,9 +44,9 @@ clean: ## Remove build artifacts
 	find . -type f -name "*.pyc" -delete 2>/dev/null || true
 
 docs: ## Build documentation
-	mkdocs build
+	zensical build
 
 docs-serve: ## Serve documentation locally
-	mkdocs serve
+	zensical serve
 
 all: format lint typecheck test ## Run all checks
