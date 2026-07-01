@@ -55,8 +55,14 @@ include = ["src/pywho", "README.md", "LICENSE", "CHANGELOG.md"]
 dev = [
     "pytest>=8.4.2",
     "pytest-cov>=7.1.0",
-    "mypy>=2.1.0",
+    "mypy>=1.0,<1.19.0",
     "ruff>=0.15.17",
+    "pre-commit<4.6.0; python_version < '3.10'",
+    "pre-commit>=4.6.0; python_version >= '3.10'",
+]
+docs = [
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.7.6",
 ]
 
 [tool.pytest.ini_options]
@@ -73,15 +79,50 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = [
-    "E",   # pycodestyle errors
-    "W",   # pycodestyle warnings
-    "F",   # pyflakes
-    "I",   # isort
-    "UP",  # pyupgrade
-    "B",   # flake8-bugbear
-    "SIM", # flake8-simplify
-    "TCH", # flake8-type-checking
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "TCH",  # flake8-type-checking
+    "RUF",  # ruff-specific rules
+]
+ignore = [
+    "UP007",  # Use X | Y for union types (need 3.9 compat)
 ]
 
 [tool.ruff.lint.isort]
 known-first-party = ["pywho"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py39, py310, py311, py312, py313, lint, typecheck
+skip_missing_interpreters = true
+
+[testenv]
+deps =
+    pytest>=7.0
+commands =
+    pytest -v {posargs}
+
+[testenv:lint]
+deps =
+    ruff
+commands =
+    ruff check src/ tests/
+    ruff format --check src/ tests/
+
+[testenv:typecheck]
+deps =
+    mypy>=1.0,<1.19.0
+commands =
+    mypy src/pywho
+"""
