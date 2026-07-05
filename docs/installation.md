@@ -14,7 +14,13 @@ pip install pywho
 ## With uv
 
 ```bash
-uv pip install pywho
+uv add --dev pywho
+```
+
+For one-off usage without changing project dependencies:
+
+```bash
+uv run --with pywho pywho
 ```
 
 ## Run as module
@@ -26,7 +32,7 @@ python -m pywho
 ```
 
 !!! warning "Why not `uvx pywho`?"
-    `uvx` runs tools inside an ephemeral sandbox environment. This means `pywho` would report that temporary environment instead of your actual project environment. Always install pywho into the environment you want to inspect.
+    `uvx` runs tools inside an ephemeral sandbox environment. This means `pywho` would report that temporary environment instead of your actual project environment. Use `uv add --dev pywho` for regular project use, or `uv run --with pywho pywho` for one-off checks.
 
 ## From source
 
