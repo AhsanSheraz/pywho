@@ -259,12 +259,15 @@ def _get_installed_packages() -> list[PackageInfo]:
         return []
 
 
-def inspect_environment(*, include_packages: bool = True) -> EnvironmentReport:
+def inspect_environment(
+    *, include_packages: bool = True, include_pip: bool = True
+) -> EnvironmentReport:
     """
     Inspect the current Python environment and return a structured report.
 
     Args:
         include_packages: Whether to list installed packages (slightly slower).
+        include_pip: Whether to detect the pip version.
 
     Returns:
         EnvironmentReport with all environment details.
@@ -295,6 +298,6 @@ def inspect_environment(*, include_packages: bool = True) -> EnvironmentReport:
         sys_path=sys.path.copy(),
         site_packages=_get_site_packages(),
         package_manager=_detect_package_manager(venv.type),
-        pip_version=_get_pip_version(),
+        pip_version=_get_pip_version() if include_pip else None,
         packages=_get_installed_packages() if include_packages else [],
     )

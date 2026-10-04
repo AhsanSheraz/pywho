@@ -142,7 +142,7 @@ def _run_scan(args: argparse.Namespace) -> int:
 
 def _run_inspect(args: argparse.Namespace) -> int:
     """Handle the default environment inspection."""
-    report = inspect_environment(include_packages=args.packages)
+    report = inspect_environment(include_packages=args.packages, include_pip=not args.no_pip)
 
     if args.json_output:
         print(json.dumps(report.to_dict(), indent=2))

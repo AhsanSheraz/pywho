@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import sys
 from typing import TYPE_CHECKING
+from unittest.mock import patch
 
 import pytest
 
@@ -51,11 +52,18 @@ class TestCLI:
         captured = capsys.readouterr()
         assert "Installed Packages" in captured.out
 
-    def test_no_pip_flag(self, capsys: pytest.CaptureFixture[str]) -> None:
-        result = main(["--no-pip", "--json"])
+    @pytest.mark.parametrize("skip_pip", [False, True])
+    def test_no_pip_flag(self, capsys: pytest.CaptureFixture[str], skip_pip: bool) -> None:
+        args = ["--json"]
+        if skip_pip:
+            args.append("--no-pip")
+        with patch("pywho.inspector._get_pip_version", return_value="test-pip") as detect:
+            result = main(args)
+        assert detect.call_count == (0 if skip_pip else 1)
         captured = capsys.readouterr()
         data = json.loads(captured.out)
         assert "interpreter" in data
+        assert data["pip_version"] == (None if skip_pip else "test-pip")
         assert result == 0
 
 
