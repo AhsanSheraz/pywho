@@ -32,7 +32,7 @@ $ pywho
 - **"Works on my machine"** is the #1 debugging friction in Python. pywho kills it with one command.
 - **Paste the output** into a GitHub issue, Slack message, or Stack Overflow question.
 - **Zero dependencies.** Pure stdlib. Works everywhere Python runs.
-- **Cross-platform.** Linux, macOS, Windows. Python 3.9+.
+- **Cross-platform.** Linux, macOS, Windows. Python 3.10+.
 
 ## Quick start
 

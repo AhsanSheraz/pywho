@@ -75,7 +75,7 @@ uv run --with pywho pywho
 - **"Works on my machine"** is the #1 debugging friction in Python. pywho kills it with one command.
 - **Paste the output** into a GitHub issue, Slack message, or Stack Overflow question. Done.
 - **Zero dependencies.** Pure stdlib. Works everywhere Python runs.
-- **Cross-platform.** Linux, macOS, Windows. Python 3.9+.
+- **Cross-platform.** Linux, macOS, Windows. Python 3.10+.
 
 ## Usage
 
@@ -317,8 +317,8 @@ With `--packages`: lists all installed packages with versions and locations.
 
 | Python | Status |
 |--------|--------|
-| 3.9+ | ✅ Supported |
-| 3.10 – 3.14 | ✅ Tested in CI |
+| 3.10+ | ✅ Supported |
+| 3.10 – 3.15 | ✅ Tested in CI |
 
 ## Development
 
