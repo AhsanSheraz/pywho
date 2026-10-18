@@ -6,9 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [0.3.4] - 2026-10-18
+
+### Added
+
+- Python 3.15 support, including a CI test matrix entry.
+
+### Changed
+
+- Dropped Python 3.9 support; the minimum supported version is now Python 3.10.
+
 ### Fixed
 
-- Skip pip version detection when `--no-pip` is passed.
+- Skip pip version detection when `--no-pip` is passed. Thanks to [@GreedyC](https://github.com/GreedyC) ([#68](https://github.com/AhsanSheraz/pywho/pull/68)).
 
 ## [0.3.3] - 2026-03-22
 
