@@ -79,6 +79,10 @@ class TestInspectEnvironment:
         report = inspect_environment(include_packages=False)
         assert report.packages == []
 
+    def test_packages_included_by_default(self) -> None:
+        report = inspect_environment()
+        assert len(report.packages) > 0
+
 
 class TestVenvDetection:
     """Test virtual environment detection."""
